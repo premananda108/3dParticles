@@ -14,7 +14,7 @@ export default function Proton({ position = [0, 0, 0] }) {
 
   return (
     <mesh ref={meshRef} position={position}>
-      <sphereGeometry args={[0.5, 32, 32]} />
+      <torusGeometry args={[0.35, 0.15, 24, 48]} />
       <meshStandardMaterial
         color="#ff3333"
         emissive="#ff0000"
@@ -25,3 +25,4 @@ export default function Proton({ position = [0, 0, 0] }) {
     </mesh>
   )
 }
+

@@ -19,11 +19,16 @@ export default function ControlPanel({
     neutronCount,
     onProtonChange,
     onNeutronChange,
+    onSetElement,
     onReset
 }) {
     const handleElementSelect = (element) => {
-        onProtonChange(element.protons)
-        onNeutronChange(element.neutrons)
+        if (onSetElement) {
+            onSetElement(element.protons, element.neutrons)
+        } else {
+            onProtonChange(element.protons)
+            onNeutronChange(element.neutrons)
+        }
     }
 
     const massNumber = protonCount + neutronCount
@@ -129,9 +134,11 @@ export default function ControlPanel({
             </div>
 
             <div className="instructions">
-                <p>🖱️ Вращение: зажмите ЛКМ и двигайте мышью</p>
+                <p>✋ Перетаскивание: кликните на частицу и двигайте</p>
+                <p>🖱️ Вращение сцены: зажмите ЛКМ на пустом месте</p>
                 <p>🔍 Зум: колёсико мыши</p>
             </div>
         </div>
     )
 }
+

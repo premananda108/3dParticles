@@ -1,17 +1,21 @@
 import { useRef, useState, useCallback } from 'react'
-import { useThree, useFrame } from '@react-three/fiber'
+import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useDragContext } from './AtomScene'
 
 export default function DraggableParticle({
     position,
     onPositionChange,
+    onRotationChange,
     children,
-    id
+    id,
+    rotation = [0, 0, 0]
 }) {
     const groupRef = useRef()
+    const innerRef = useRef()
     const [isHovered, setIsHovered] = useState(false)
     const [localDragging, setLocalDragging] = useState(false)
+    const [isRotating, setIsRotating] = useState(false)
     const { camera, gl } = useThree()
     const { setIsDragging } = useDragContext()
 
@@ -21,8 +25,62 @@ export default function DraggableParticle({
     const offset = useRef(new THREE.Vector3())
     const raycaster = useRef(new THREE.Raycaster())
     const mousePos = useRef(new THREE.Vector2())
+    const lastMousePos = useRef({ x: 0, y: 0 })
+    const currentRotation = useRef(new THREE.Euler(...rotation))
 
+    // Left-click: Move particle
     const handlePointerDown = useCallback((e) => {
+        // Right-click for rotation
+        if (e.button === 2) {
+            e.stopPropagation()
+            e.nativeEvent.preventDefault()
+
+            setIsRotating(true)
+            setIsDragging(true)
+            gl.domElement.style.cursor = 'crosshair'
+
+            lastMousePos.current = { x: e.clientX, y: e.clientY }
+
+            const handleMouseMove = (moveEvent) => {
+                if (!innerRef.current) return
+
+                const deltaX = moveEvent.clientX - lastMousePos.current.x
+                const deltaY = moveEvent.clientY - lastMousePos.current.y
+
+                // Rotate based on mouse movement
+                currentRotation.current.y += deltaX * 0.02
+                currentRotation.current.x += deltaY * 0.02
+
+                innerRef.current.rotation.copy(currentRotation.current)
+
+                if (onRotationChange) {
+                    onRotationChange(id, [
+                        currentRotation.current.x,
+                        currentRotation.current.y,
+                        currentRotation.current.z
+                    ])
+                }
+
+                lastMousePos.current = { x: moveEvent.clientX, y: moveEvent.clientY }
+            }
+
+            const handleMouseUp = () => {
+                setIsRotating(false)
+                setIsDragging(false)
+                gl.domElement.style.cursor = isHovered ? 'grab' : 'auto'
+
+                window.removeEventListener('mousemove', handleMouseMove)
+                window.removeEventListener('mouseup', handleMouseUp)
+            }
+
+            window.addEventListener('mousemove', handleMouseMove)
+            window.addEventListener('mouseup', handleMouseUp)
+            return
+        }
+
+        // Left-click for translation
+        if (e.button !== 0) return
+
         e.stopPropagation()
 
         if (!groupRef.current) return
@@ -84,23 +142,29 @@ export default function DraggableParticle({
 
         window.addEventListener('mousemove', handleMouseMove)
         window.addEventListener('mouseup', handleMouseUp)
-    }, [camera, gl, id, onPositionChange, setIsDragging, isHovered])
+    }, [camera, gl, id, onPositionChange, onRotationChange, setIsDragging, isHovered])
 
     const handlePointerOver = useCallback((e) => {
         e.stopPropagation()
         setIsHovered(true)
-        if (!localDragging) {
+        if (!localDragging && !isRotating) {
             gl.domElement.style.cursor = 'grab'
         }
-    }, [gl, localDragging])
+    }, [gl, localDragging, isRotating])
 
     const handlePointerOut = useCallback((e) => {
         e.stopPropagation()
         setIsHovered(false)
-        if (!localDragging) {
+        if (!localDragging && !isRotating) {
             gl.domElement.style.cursor = 'auto'
         }
-    }, [gl, localDragging])
+    }, [gl, localDragging, isRotating])
+
+    // Prevent context menu on right-click
+    const handleContextMenu = useCallback((e) => {
+        e.preventDefault()
+        e.stopPropagation()
+    }, [])
 
     return (
         <group
@@ -109,9 +173,14 @@ export default function DraggableParticle({
             onPointerDown={handlePointerDown}
             onPointerOver={handlePointerOver}
             onPointerOut={handlePointerOut}
+            onContextMenu={handleContextMenu}
         >
             {/* Scale up slightly when hovering or dragging for feedback */}
-            <group scale={localDragging ? 1.2 : isHovered ? 1.1 : 1}>
+            <group
+                ref={innerRef}
+                scale={localDragging || isRotating ? 1.2 : isHovered ? 1.1 : 1}
+                rotation={rotation}
+            >
                 {children}
             </group>
         </group>

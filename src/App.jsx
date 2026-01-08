@@ -35,7 +35,7 @@ function generateClusterPositions(count, existingPositions = []) {
         y + (Math.random() - 0.5) * jitter,
         z + (Math.random() - 0.5) * jitter
       ],
-      rotation: [Math.random() * Math.PI, Math.random() * Math.PI, 0]
+      rotation: [0, 0, 0]
     })
   }
 
@@ -47,6 +47,8 @@ function App() {
     { id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0] }
   ])
   const [neutrons, setNeutrons] = useState([])
+
+  const [draggedParticleType, setDraggedParticleType] = useState(null)
 
   const handleProtonCountChange = useCallback((newCount) => {
     setProtons(prev => {
@@ -64,6 +66,32 @@ function App() {
       }
       return prev.slice(0, newCount)
     })
+  }, [])
+
+  const handleAddParticleStart = useCallback((type) => {
+    setDraggedParticleType(type)
+  }, [])
+
+  const handlePlaceParticle = useCallback((position) => {
+    if (!draggedParticleType) return
+
+    const newParticle = {
+      id: `${draggedParticleType}-${Date.now()}`,
+      position: position,
+      rotation: [0, 0, 0]
+    }
+
+    if (draggedParticleType === 'proton') {
+      setProtons(prev => [...prev, newParticle])
+    } else {
+      setNeutrons(prev => [...prev, newParticle])
+    }
+
+    setDraggedParticleType(null)
+  }, [draggedParticleType])
+
+  const handleCancelPlacement = useCallback(() => {
+    setDraggedParticleType(null)
   }, [])
 
   const handleProtonPositionChange = useCallback((id, newPosition) => {
@@ -112,12 +140,17 @@ function App() {
         onNeutronPositionChange={handleNeutronPositionChange}
         onProtonRotationChange={handleProtonRotationChange}
         onNeutronRotationChange={handleNeutronRotationChange}
+        draggedParticleType={draggedParticleType}
+        onPlaceParticle={handlePlaceParticle}
+        onCancelPlacement={handleCancelPlacement}
       />
       <ControlPanel
         protonCount={protons.length}
         neutronCount={neutrons.length}
         onProtonChange={handleProtonCountChange}
         onNeutronChange={handleNeutronCountChange}
+        onAddParticleStart={handleAddParticleStart}
+        draggedParticleType={draggedParticleType}
         onSetElement={handleSetElement}
         onReset={handleReset}
       />

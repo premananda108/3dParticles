@@ -13,7 +13,7 @@
   padding: 24px;
   color: white;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  box-shadow: 
+  box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -96,81 +96,110 @@ h2 {
   letter-spacing: 1px;
 }
 
-.particle-controls {
-  display: flex;
-  flex-direction: column;
+/* New Particle Tools Styles */
+.particle-tool-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-bottom: 16px;
 }
 
-.particle-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.03);
+.particle-tool {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 10px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.particle-label {
-  font-weight: 600;
-  font-size: 0.95rem;
+.particle-tool:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.proton-label {
+.particle-tool.active {
+  border-color: currentColor;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+  transform: translateY(0);
+}
+
+.proton-tool {
   color: #ff6b6b;
 }
 
-.neutron-label {
+.neutron-tool {
   color: #4ecdc4;
 }
 
-.button-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.proton-tool.active {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
 }
 
-.control-btn {
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 10px;
-  font-size: 1.2rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.neutron-tool.active {
+  border-color: #4ecdc4;
+  box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
 }
 
-.control-btn.plus {
-  background: linear-gradient(135deg, #4ecdc4, #44a08d);
-  color: white;
+.tool-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  position: relative;
 }
 
-.control-btn.minus {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
-  color: white;
+.proton-icon {
+  background: radial-gradient(circle at 30% 30%, #ff8e8e, #ff6b6b);
+  box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
 }
 
-.control-btn:hover:not(:disabled) {
-  transform: scale(1.1);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+.proton-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
 }
 
-.control-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.neutron-icon {
+  background: radial-gradient(circle at 30% 30%, #7eece4, #4ecdc4);
+  box-shadow: 0 0 20px rgba(78, 205, 196, 0.4);
 }
 
-.count {
-  font-size: 1.1rem;
-  font-weight: 700;
-  min-width: 30px;
-  text-align: center;
+.neutron-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+}
+
+.particle-tool span {
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Reset Button */
+.reset-section {
+  margin-top: 10px;
 }
 
 .reset-btn {
@@ -191,6 +220,7 @@ h2 {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+/* Elements Grid */
 .elements-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -278,7 +308,7 @@ h2 {
     top: auto;
     bottom: 20px;
   }
-  
+
   .elements-grid {
     grid-template-columns: repeat(5, 1fr);
   }

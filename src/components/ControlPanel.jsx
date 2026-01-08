@@ -20,7 +20,9 @@ export default function ControlPanel({
     onProtonChange,
     onNeutronChange,
     onSetElement,
-    onReset
+    onReset,
+    onAddParticleStart,
+    draggedParticleType
 }) {
     const handleElementSelect = (element) => {
         if (onSetElement) {
@@ -55,51 +57,31 @@ export default function ControlPanel({
             <div className="controls-section">
                 <h2>Управление частицами</h2>
 
-                <div className="particle-controls">
-                    <div className="particle-row">
-                        <span className="particle-label proton-label">Протоны</span>
-                        <div className="button-group">
-                            <button
-                                className="control-btn minus"
-                                onClick={() => onProtonChange(Math.max(0, protonCount - 1))}
-                                disabled={protonCount === 0}
-                            >
-                                −
-                            </button>
-                            <span className="count">{protonCount}</span>
-                            <button
-                                className="control-btn plus"
-                                onClick={() => onProtonChange(protonCount + 1)}
-                            >
-                                +
-                            </button>
-                        </div>
+                <div className="particle-tool-group">
+                    <div
+                        className={`particle-tool proton-tool ${draggedParticleType === 'proton' ? 'active' : ''}`}
+                        onClick={() => onAddParticleStart('proton')}
+                        title="Кликните, чтобы добавить протон"
+                    >
+                        <div className="tool-icon proton-icon"></div>
+                        <span>Добавить Протон</span>
                     </div>
 
-                    <div className="particle-row">
-                        <span className="particle-label neutron-label">Нейтроны</span>
-                        <div className="button-group">
-                            <button
-                                className="control-btn minus"
-                                onClick={() => onNeutronChange(Math.max(0, neutronCount - 1))}
-                                disabled={neutronCount === 0}
-                            >
-                                −
-                            </button>
-                            <span className="count">{neutronCount}</span>
-                            <button
-                                className="control-btn plus"
-                                onClick={() => onNeutronChange(neutronCount + 1)}
-                            >
-                                +
-                            </button>
-                        </div>
+                    <div
+                        className={`particle-tool neutron-tool ${draggedParticleType === 'neutron' ? 'active' : ''}`}
+                        onClick={() => onAddParticleStart('neutron')}
+                        title="Кликните, чтобы добавить нейтрон"
+                    >
+                        <div className="tool-icon neutron-icon"></div>
+                        <span>Добавить Нейтрон</span>
                     </div>
                 </div>
 
-                <button className="reset-btn" onClick={onReset}>
-                    🔄 Сбросить
-                </button>
+                <div className="reset-section">
+                    <button className="reset-btn" onClick={onReset}>
+                        🔄 Сбросить сцену
+                    </button>
+                </div>
             </div>
 
             <div className="elements-section">
@@ -134,11 +116,11 @@ export default function ControlPanel({
             </div>
 
             <div className="instructions">
-                <p>✋ Перетаскивание: кликните на частицу и двигайте</p>
-                <p>🖱️ Вращение сцены: зажмите ЛКМ на пустом месте</p>
-                <p>🔍 Зум: колёсико мыши</p>
+                <p>➕ <b>Добавление</b>: Кликните "Добавить..." и разместите частицу в сцене</p>
+                <p>✋ <b>Перемещение</b>: ЛКМ + Drag на частице</p>
+                <p>🔄 <b>Вращение частицы</b>: ПКМ + Drag на частице</p>
+                <p>🖱️ <b>Вращение сцены</b>: Drag на пустом месте</p>
             </div>
         </div>
     )
 }
-

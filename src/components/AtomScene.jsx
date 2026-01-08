@@ -2,6 +2,7 @@ import { useState, useRef, createContext, useContext } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars, Environment } from '@react-three/drei'
 import Nucleus from './Nucleus'
+import ParticlePlacer from './ParticlePlacer'
 
 // Context to control OrbitControls from child components
 export const DragContext = createContext({
@@ -20,7 +21,10 @@ function SceneContent({
     onNeutronPositionChange,
     onProtonRotationChange,
     onNeutronRotationChange,
-    isDragging
+    isDragging,
+    draggedParticleType,
+    onPlaceParticle,
+    onCancelPlacement
 }) {
     const controlsRef = useRef()
 
@@ -56,6 +60,15 @@ function SceneContent({
                 onNeutronRotationChange={onNeutronRotationChange}
             />
 
+            {/* Ghost particle for placement */}
+            {draggedParticleType && (
+                <ParticlePlacer
+                    type={draggedParticleType}
+                    onPlace={onPlaceParticle}
+                    onCancel={onCancelPlacement}
+                />
+            )}
+
             {/* Camera controls - disabled when dragging particles */}
             <OrbitControls
                 ref={controlsRef}
@@ -77,7 +90,10 @@ export default function AtomScene({
     onProtonPositionChange,
     onNeutronPositionChange,
     onProtonRotationChange,
-    onNeutronRotationChange
+    onNeutronRotationChange,
+    draggedParticleType,
+    onPlaceParticle,
+    onCancelPlacement
 }) {
     const [isDragging, setIsDragging] = useState(false)
 
@@ -96,6 +112,9 @@ export default function AtomScene({
                         onProtonRotationChange={onProtonRotationChange}
                         onNeutronRotationChange={onNeutronRotationChange}
                         isDragging={isDragging}
+                        draggedParticleType={draggedParticleType}
+                        onPlaceParticle={onPlaceParticle}
+                        onCancelPlacement={onCancelPlacement}
                     />
                 </Canvas>
             </DragContext.Provider>

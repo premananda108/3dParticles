@@ -140,12 +140,37 @@ function App() {
   }, [])
 
   // Set specific element configuration
-  const handleSetElement = useCallback((protonCount, neutronCount) => {
-    const newProtons = generateClusterPositions(protonCount, [])
+  const handleSetElement = useCallback((protonCount, neutronCount, electronCount = 0) => {
+    let newProtons = []
+
+    // For single proton (Hydrogen), place it exactly at center to match electron
+    if (protonCount === 1) {
+      newProtons = [{
+        id: `proton-${Date.now()}-center`,
+        position: [0, 0, 0],
+        rotation: [0, 0, 0]
+      }]
+    } else {
+      newProtons = generateClusterPositions(protonCount, [])
+    }
+
     const newNeutrons = generateClusterPositions(neutronCount, [])
+
+    // For Hydrogen (1p, 1e), we want the electron to envelop the proton at the center.
+    let newElectrons = []
+    if (electronCount === 1) {
+      newElectrons = [{
+        id: `electron-${Date.now()}-0`,
+        position: [0, 0, 0],
+        rotation: [0, 0, 0]
+      }]
+    } else {
+      newElectrons = generateClusterPositions(electronCount, [])
+    }
+
     setProtons(newProtons)
     setNeutrons(newNeutrons)
-    setElectrons([])
+    setElectrons(newElectrons)
   }, [])
 
   return (

@@ -2,16 +2,7 @@ import './ControlPanel.css'
 
 // Predefined elements with their proton and neutron counts
 const ELEMENTS = [
-    { symbol: 'H', name: 'Водород', protons: 1, neutrons: 0 },
-    { symbol: 'He', name: 'Гелий', protons: 2, neutrons: 2 },
-    { symbol: 'Li', name: 'Литий', protons: 3, neutrons: 4 },
-    { symbol: 'Be', name: 'Бериллий', protons: 4, neutrons: 5 },
-    { symbol: 'B', name: 'Бор', protons: 5, neutrons: 6 },
-    { symbol: 'C', name: 'Углерод', protons: 6, neutrons: 6 },
-    { symbol: 'N', name: 'Азот', protons: 7, neutrons: 7 },
-    { symbol: 'O', name: 'Кислород', protons: 8, neutrons: 8 },
-    { symbol: 'Fe', name: 'Железо', protons: 26, neutrons: 30 },
-    { symbol: 'Au', name: 'Золото', protons: 79, neutrons: 118 },
+    { symbol: 'H', name: 'Водород', protons: 1, neutrons: 0, electrons: 1 },
 ]
 
 export default function ControlPanel({
@@ -26,7 +17,8 @@ export default function ControlPanel({
 }) {
     const handleElementSelect = (element) => {
         if (onSetElement) {
-            onSetElement(element.protons, element.neutrons)
+            // Pass protons, neutrons, AND electrons
+            onSetElement(element.protons, element.neutrons, element.electrons || 0)
         } else {
             onProtonChange(element.protons)
             onNeutronChange(element.neutrons)

@@ -6,7 +6,9 @@ export default function Nucleus({
     protons,
     neutrons,
     onProtonPositionChange,
-    onNeutronPositionChange
+    onNeutronPositionChange,
+    onProtonRotationChange,
+    onNeutronRotationChange
 }) {
     return (
         <group>
@@ -15,7 +17,9 @@ export default function Nucleus({
                     key={particle.id}
                     id={particle.id}
                     position={particle.position}
+                    rotation={particle.rotation}
                     onPositionChange={onProtonPositionChange}
+                    onRotationChange={onProtonRotationChange}
                 >
                     <Proton />
                 </DraggableParticle>
@@ -25,7 +29,9 @@ export default function Nucleus({
                     key={particle.id}
                     id={particle.id}
                     position={particle.position}
+                    rotation={particle.rotation}
                     onPositionChange={onNeutronPositionChange}
+                    onRotationChange={onNeutronRotationChange}
                 >
                     <Neutron />
                 </DraggableParticle>

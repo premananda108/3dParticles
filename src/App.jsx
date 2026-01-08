@@ -34,7 +34,8 @@ function generateClusterPositions(count, existingPositions = []) {
         x + (Math.random() - 0.5) * jitter,
         y + (Math.random() - 0.5) * jitter,
         z + (Math.random() - 0.5) * jitter
-      ]
+      ],
+      rotation: [Math.random() * Math.PI, Math.random() * Math.PI, 0]
     })
   }
 
@@ -43,7 +44,7 @@ function generateClusterPositions(count, existingPositions = []) {
 
 function App() {
   const [protons, setProtons] = useState([
-    { id: 'proton-0', position: [0, 0, 0] }
+    { id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0] }
   ])
   const [neutrons, setNeutrons] = useState([])
 
@@ -77,8 +78,20 @@ function App() {
     ))
   }, [])
 
+  const handleProtonRotationChange = useCallback((id, newRotation) => {
+    setProtons(prev => prev.map(p =>
+      p.id === id ? { ...p, rotation: newRotation } : p
+    ))
+  }, [])
+
+  const handleNeutronRotationChange = useCallback((id, newRotation) => {
+    setNeutrons(prev => prev.map(n =>
+      n.id === id ? { ...n, rotation: newRotation } : n
+    ))
+  }, [])
+
   const handleReset = useCallback(() => {
-    setProtons([{ id: 'proton-0', position: [0, 0, 0] }])
+    setProtons([{ id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0] }])
     setNeutrons([])
   }, [])
 
@@ -97,6 +110,8 @@ function App() {
         neutrons={neutrons}
         onProtonPositionChange={handleProtonPositionChange}
         onNeutronPositionChange={handleNeutronPositionChange}
+        onProtonRotationChange={handleProtonRotationChange}
+        onNeutronRotationChange={handleNeutronRotationChange}
       />
       <ControlPanel
         protonCount={protons.length}

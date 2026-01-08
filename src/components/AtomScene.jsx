@@ -18,6 +18,8 @@ function SceneContent({
     neutrons,
     onProtonPositionChange,
     onNeutronPositionChange,
+    onProtonRotationChange,
+    onNeutronRotationChange,
     isDragging
 }) {
     const controlsRef = useRef()
@@ -50,6 +52,8 @@ function SceneContent({
                 neutrons={neutrons}
                 onProtonPositionChange={onProtonPositionChange}
                 onNeutronPositionChange={onNeutronPositionChange}
+                onProtonRotationChange={onProtonRotationChange}
+                onNeutronRotationChange={onNeutronRotationChange}
             />
 
             {/* Camera controls - disabled when dragging particles */}
@@ -71,7 +75,9 @@ export default function AtomScene({
     protons,
     neutrons,
     onProtonPositionChange,
-    onNeutronPositionChange
+    onNeutronPositionChange,
+    onProtonRotationChange,
+    onNeutronRotationChange
 }) {
     const [isDragging, setIsDragging] = useState(false)
 
@@ -87,6 +93,8 @@ export default function AtomScene({
                         neutrons={neutrons}
                         onProtonPositionChange={onProtonPositionChange}
                         onNeutronPositionChange={onNeutronPositionChange}
+                        onProtonRotationChange={onProtonRotationChange}
+                        onNeutronRotationChange={onNeutronRotationChange}
                         isDragging={isDragging}
                     />
                 </Canvas>

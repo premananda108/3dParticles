@@ -9,7 +9,9 @@ export default function DraggableParticle({
     onRotationChange,
     children,
     id,
-    rotation = [0, 0, 0]
+    rotation = [0, 0, 0],
+    positionStep = 0.5,
+    rotationStep = Math.PI / 12 // 15 degrees
 }) {
     const groupRef = useRef()
     const innerRef = useRef()
@@ -27,6 +29,9 @@ export default function DraggableParticle({
     const mousePos = useRef(new THREE.Vector2())
     const lastMousePos = useRef({ x: 0, y: 0 })
     const currentRotation = useRef(new THREE.Euler(...rotation))
+
+    // Snap helper
+    const snapToGrid = (val, step) => Math.round(val / step) * step
 
     // Left-click: Move particle
     const handlePointerDown = useCallback((e) => {
@@ -48,8 +53,12 @@ export default function DraggableParticle({
                 const deltaY = moveEvent.clientY - lastMousePos.current.y
 
                 // Rotate based on mouse movement
-                currentRotation.current.y += deltaX * 0.02
-                currentRotation.current.x += deltaY * 0.02
+                const rawRotY = currentRotation.current.y + deltaX * 0.02
+                const rawRotX = currentRotation.current.x + deltaY * 0.02
+
+                // Snap rotation
+                currentRotation.current.y = snapToGrid(rawRotY, rotationStep)
+                currentRotation.current.x = snapToGrid(rawRotX, rotationStep)
 
                 innerRef.current.rotation.copy(currentRotation.current)
 
@@ -122,7 +131,15 @@ export default function DraggableParticle({
 
             raycaster.current.setFromCamera(mousePos.current, camera)
             if (raycaster.current.ray.intersectPlane(dragPlane.current, intersection.current)) {
-                const newPosition = intersection.current.clone().add(offset.current)
+                const rawPosition = intersection.current.clone().add(offset.current)
+
+                // Snap position
+                const newPosition = new THREE.Vector3(
+                    snapToGrid(rawPosition.x, positionStep),
+                    snapToGrid(rawPosition.y, positionStep),
+                    snapToGrid(rawPosition.z, positionStep)
+                )
+
                 groupRef.current.position.copy(newPosition)
 
                 if (onPositionChange) {
@@ -142,7 +159,7 @@ export default function DraggableParticle({
 
         window.addEventListener('mousemove', handleMouseMove)
         window.addEventListener('mouseup', handleMouseUp)
-    }, [camera, gl, id, onPositionChange, onRotationChange, setIsDragging, isHovered])
+    }, [camera, gl, id, onPositionChange, onRotationChange, setIsDragging, isHovered, positionStep, rotationStep])
 
     const handlePointerOver = useCallback((e) => {
         e.stopPropagation()

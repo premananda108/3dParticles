@@ -29,7 +29,7 @@ export default function ControlPanel({
 
     return (
         <div className="control-panel">
-            <h1 className="title">⚛️ Моделирование ядра атома</h1>
+            <h1 className="title">⚛️ Моделирование атома</h1>
 
             <div className="info-display">
                 <div className="info-item">

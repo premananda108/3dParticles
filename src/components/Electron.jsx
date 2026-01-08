@@ -7,23 +7,30 @@ export default function Electron() {
     return (
         <mesh ref={meshRef}>
             {/* 
-        Proton: args={[0.35, 0.15, 24, 48]} 
-        Electron req: 5x larger overall, but smaller inner diameter (tube thickness smaller?)
-        Let's interpret "inner diameter smaller" = thinner tube relative to size, or absolute.
-        Let's try: Radius = 0.35 * 5 = 1.75. Tube = 0.1 (thinner than proton's 0.15)
-      */}
-            <torusGeometry args={[1.75, 0.1, 32, 64]} />
+                Proton: args={[0.35, 0.15, ...]} -> Inner Radius = 0.2
+                Electron Req: 
+                1. "Envelop proton" -> Thick tube
+                2. "Inner diameter < proton's" -> Inner Radius < 0.2
+                
+                New Args: [0.8, 0.75, 32, 64]
+                - Main Radius: 0.8
+                - Tube Radius: 0.75
+                - Inner Radius = 0.8 - 0.75 = 0.05 (Very small hole)
+                - Outer Radius = 0.8 + 0.75 = 1.55 (Large cloud)
+            */}
+            <torusGeometry args={[0.8, 0.75, 32, 64]} />
             <meshPhysicalMaterial
-                color="#88ccff"
-                emissive="#44aadd"
-                emissiveIntensity={0.5}
+                color="#aaddff" // Lighter blue
+                emissive="#4488bb"
+                emissiveIntensity={0.2} // Lower emission to see inside better
                 transparent={true}
-                opacity={0.4}
-                roughness={0}
+                opacity={0.3} // More transparent to see enveloped protons
+                roughness={0.1}
                 metalness={0.1}
-                transmission={0.2}
-                clearcoat={1}
+                transmission={0.1}
+                clearcoat={0.5}
                 side={THREE.DoubleSide}
+                depthWrite={false} // Helps with transparency rendering inside-out
             />
         </mesh>
     )

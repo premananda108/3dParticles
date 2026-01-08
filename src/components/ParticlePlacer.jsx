@@ -3,6 +3,7 @@ import { useThree, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import Proton from './Proton'
 import Neutron from './Neutron'
+import Electron from './Electron'
 import { useDragContext } from './AtomScene'
 
 export default function ParticlePlacer({
@@ -81,10 +82,19 @@ export default function ParticlePlacer({
         }
     }, [camera, gl, setIsDragging, onPlace, onCancel])
 
+    const getParticleComponent = () => {
+        switch (type) {
+            case 'proton': return <Proton />
+            case 'neutron': return <Neutron />
+            case 'electron': return <Electron />
+            default: return null
+        }
+    }
+
     return (
         <group ref={meshRef} position={position}>
             <group scale={1.2} style={{ opacity: 0.7 }}>
-                {type === 'proton' ? <Proton /> : <Neutron />}
+                {getParticleComponent()}
             </group>
         </group>
     )

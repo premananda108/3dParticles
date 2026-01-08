@@ -75,6 +75,15 @@ export default function ControlPanel({
                         <div className="tool-icon neutron-icon"></div>
                         <span>Добавить Нейтрон</span>
                     </div>
+
+                    <div
+                        className={`particle-tool electron-tool ${draggedParticleType === 'electron' ? 'active' : ''}`}
+                        onClick={() => onAddParticleStart('electron')}
+                        title="Кликните, чтобы добавить электрон"
+                    >
+                        <div className="tool-icon electron-icon"></div>
+                        <span>Добавить Электрон</span>
+                    </div>
                 </div>
 
                 <div className="reset-section">
@@ -106,11 +115,15 @@ export default function ControlPanel({
                 <div className="legend-items">
                     <div className="legend-item">
                         <span className="legend-color proton-color"></span>
-                        <span>Протон (+1)</span>
+                        <span>Протон</span>
                     </div>
                     <div className="legend-item">
                         <span className="legend-color neutron-color"></span>
-                        <span>Нейтрон (0)</span>
+                        <span>Нейтрон</span>
+                    </div>
+                    <div className="legend-item">
+                        <span className="legend-color electron-color"></span>
+                        <span>Электрон</span>
                     </div>
                 </div>
             </div>

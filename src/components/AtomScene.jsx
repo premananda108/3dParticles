@@ -17,10 +17,13 @@ export function useDragContext() {
 function SceneContent({
     protons,
     neutrons,
+    electrons,
     onProtonPositionChange,
     onNeutronPositionChange,
+    onElectronPositionChange,
     onProtonRotationChange,
     onNeutronRotationChange,
+    onElectronRotationChange,
     isDragging,
     draggedParticleType,
     onPlaceParticle,
@@ -54,10 +57,13 @@ function SceneContent({
             <Nucleus
                 protons={protons}
                 neutrons={neutrons}
+                electrons={electrons}
                 onProtonPositionChange={onProtonPositionChange}
                 onNeutronPositionChange={onNeutronPositionChange}
+                onElectronPositionChange={onElectronPositionChange}
                 onProtonRotationChange={onProtonRotationChange}
                 onNeutronRotationChange={onNeutronRotationChange}
+                onElectronRotationChange={onElectronRotationChange}
             />
 
             {/* Ghost particle for placement */}
@@ -87,10 +93,13 @@ function SceneContent({
 export default function AtomScene({
     protons,
     neutrons,
+    electrons,
     onProtonPositionChange,
     onNeutronPositionChange,
+    onElectronPositionChange,
     onProtonRotationChange,
     onNeutronRotationChange,
+    onElectronRotationChange,
     draggedParticleType,
     onPlaceParticle,
     onCancelPlacement
@@ -107,10 +116,13 @@ export default function AtomScene({
                     <SceneContent
                         protons={protons}
                         neutrons={neutrons}
+                        electrons={electrons}
                         onProtonPositionChange={onProtonPositionChange}
                         onNeutronPositionChange={onNeutronPositionChange}
+                        onElectronPositionChange={onElectronPositionChange}
                         onProtonRotationChange={onProtonRotationChange}
                         onNeutronRotationChange={onNeutronRotationChange}
+                        onElectronRotationChange={onElectronRotationChange}
                         isDragging={isDragging}
                         draggedParticleType={draggedParticleType}
                         onPlaceParticle={onPlaceParticle}

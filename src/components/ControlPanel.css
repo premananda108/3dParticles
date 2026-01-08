@@ -149,6 +149,17 @@ h2 {
   box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
 }
 
+.electron-tool {
+  color: #88ccff;
+  grid-column: span 2;
+  /* Make electron button wide since it's big in 3D too */
+}
+
+.electron-tool.active {
+  border-color: #88ccff;
+  box-shadow: 0 0 15px rgba(136, 204, 255, 0.3);
+}
+
 .tool-icon {
   width: 40px;
   height: 40px;
@@ -187,6 +198,25 @@ h2 {
   width: 14px;
   height: 14px;
   background: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+}
+
+.electron-icon {
+  background: rgba(136, 204, 255, 0.3);
+  border: 2px solid rgba(136, 204, 255, 0.6);
+  box-shadow: 0 0 20px rgba(136, 204, 255, 0.2);
+}
+
+.electron-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  /* Thinner inner ring */
+  height: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 50%;
 }
 
@@ -287,6 +317,12 @@ h2 {
 .neutron-color {
   background: #4ecdc4;
   color: #4ecdc4;
+}
+
+.electron-color {
+  background: #88ccff;
+  color: #88ccff;
+  opacity: 0.6;
 }
 
 .instructions {

@@ -47,6 +47,7 @@ function App() {
     { id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0] }
   ])
   const [neutrons, setNeutrons] = useState([])
+  const [electrons, setElectrons] = useState([])
 
   const [draggedParticleType, setDraggedParticleType] = useState(null)
 
@@ -83,8 +84,10 @@ function App() {
 
     if (draggedParticleType === 'proton') {
       setProtons(prev => [...prev, newParticle])
-    } else {
+    } else if (draggedParticleType === 'neutron') {
       setNeutrons(prev => [...prev, newParticle])
+    } else if (draggedParticleType === 'electron') {
+      setElectrons(prev => [...prev, newParticle])
     }
 
     setDraggedParticleType(null)
@@ -118,9 +121,22 @@ function App() {
     ))
   }, [])
 
+  const handleElectronPositionChange = useCallback((id, newPosition) => {
+    setElectrons(prev => prev.map(e =>
+      e.id === id ? { ...e, position: newPosition } : e
+    ))
+  }, [])
+
+  const handleElectronRotationChange = useCallback((id, newRotation) => {
+    setElectrons(prev => prev.map(e =>
+      e.id === id ? { ...e, rotation: newRotation } : e
+    ))
+  }, [])
+
   const handleReset = useCallback(() => {
     setProtons([{ id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0] }])
     setNeutrons([])
+    setElectrons([])
   }, [])
 
   // Set specific element configuration
@@ -129,6 +145,7 @@ function App() {
     const newNeutrons = generateClusterPositions(neutronCount, [])
     setProtons(newProtons)
     setNeutrons(newNeutrons)
+    setElectrons([])
   }, [])
 
   return (
@@ -136,10 +153,13 @@ function App() {
       <AtomScene
         protons={protons}
         neutrons={neutrons}
+        electrons={electrons}
         onProtonPositionChange={handleProtonPositionChange}
         onNeutronPositionChange={handleNeutronPositionChange}
+        onElectronPositionChange={handleElectronPositionChange}
         onProtonRotationChange={handleProtonRotationChange}
         onNeutronRotationChange={handleNeutronRotationChange}
+        onElectronRotationChange={handleElectronRotationChange}
         draggedParticleType={draggedParticleType}
         onPlaceParticle={handlePlaceParticle}
         onCancelPlacement={handleCancelPlacement}

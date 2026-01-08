@@ -1,14 +1,18 @@
 import Proton from './Proton'
 import Neutron from './Neutron'
+import Electron from './Electron'
 import DraggableParticle from './DraggableParticle'
 
 export default function Nucleus({
     protons,
     neutrons,
+    electrons,
     onProtonPositionChange,
     onNeutronPositionChange,
+    onElectronPositionChange,
     onProtonRotationChange,
-    onNeutronRotationChange
+    onNeutronRotationChange,
+    onElectronRotationChange
 }) {
     return (
         <group>
@@ -34,6 +38,18 @@ export default function Nucleus({
                     onRotationChange={onNeutronRotationChange}
                 >
                     <Neutron />
+                </DraggableParticle>
+            ))}
+            {electrons?.map((particle) => (
+                <DraggableParticle
+                    key={particle.id}
+                    id={particle.id}
+                    position={particle.position}
+                    rotation={particle.rotation}
+                    onPositionChange={onElectronPositionChange}
+                    onRotationChange={onElectronRotationChange}
+                >
+                    <Electron />
                 </DraggableParticle>
             ))}
         </group>

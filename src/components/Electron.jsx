@@ -20,17 +20,16 @@ export default function Electron() {
             */}
             <torusGeometry args={[0.8, 0.75, 32, 64]} />
             <meshPhysicalMaterial
-                color="#b5caefff"
-                emissive="#2266dd"
-                emissiveIntensity={0.2} // Lower emission to see inside better
+                color="#0088ff" // Much stronger blue
+                emissive="#0044aa" // Deep blue emission
+                emissiveIntensity={0.5} // Higher emission for glowing effect
                 transparent={true}
-                opacity={0.3} // More transparent to see enveloped protons
-                roughness={0.1}
+                opacity={0.35}
+                roughness={0.2}
                 metalness={0.1}
-                transmission={0.1}
-                clearcoat={0.5}
+                clearcoat={0.3}
                 side={THREE.DoubleSide}
-                depthWrite={false} // Helps with transparency rendering inside-out
+                depthWrite={false}
             />
         </mesh>
     )

@@ -2,7 +2,6 @@ import { useState, useRef, createContext, useContext } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars, Environment } from '@react-three/drei'
 import Nucleus from './Nucleus'
-import ParticlePlacer from './ParticlePlacer'
 
 // Context to control OrbitControls from child components
 export const DragContext = createContext({
@@ -27,9 +26,6 @@ export default function AtomScene({
     onProtonRotationChange,
     onNeutronRotationChange,
     onElectronRotationChange,
-    draggedParticleType,
-    onPlaceParticle,
-    onCancelPlacement,
     onDragStart,
     onDragEnd
 }) {
@@ -61,9 +57,6 @@ export default function AtomScene({
                         onNeutronRotationChange={onNeutronRotationChange}
                         onElectronRotationChange={onElectronRotationChange}
                         isDragging={isDragging}
-                        draggedParticleType={draggedParticleType}
-                        onPlaceParticle={onPlaceParticle}
-                        onCancelPlacement={onCancelPlacement}
                         onDragStart={onDragStart}
                         onDragEnd={onDragEnd}
                     />
@@ -86,9 +79,6 @@ function SceneContent({
     onNeutronRotationChange,
     onElectronRotationChange,
     isDragging,
-    draggedParticleType,
-    onPlaceParticle,
-    onCancelPlacement,
     onDragStart,
     onDragEnd
 }) {
@@ -132,15 +122,6 @@ function SceneContent({
                 onDragStart={onDragStart}
                 onDragEnd={onDragEnd}
             />
-
-            {/* Ghost particle for placement */}
-            {draggedParticleType && (
-                <ParticlePlacer
-                    type={draggedParticleType}
-                    onPlace={onPlaceParticle}
-                    onCancel={onCancelPlacement}
-                />
-            )}
 
             {/* Camera controls - disabled when dragging particles */}
             <OrbitControls

@@ -73,31 +73,23 @@ function App() {
   }, [])
 
   const handleAddParticleStart = useCallback((type) => {
-    setDraggedParticleType(type)
-  }, [])
-
-  const handlePlaceParticle = useCallback((position) => {
-    if (!draggedParticleType) return
-
+    const newId = `${type}-${Date.now()}`
     const newParticle = {
-      id: `${draggedParticleType}-${Date.now()}`,
-      position: position,
+      id: newId,
+      position: [0, 0, 0],
       rotation: [0, 0, 0]
     }
 
-    if (draggedParticleType === 'proton') {
+    if (type === 'proton') {
       setProtons(prev => [...prev, newParticle])
-    } else if (draggedParticleType === 'neutron') {
+    } else if (type === 'neutron') {
       setNeutrons(prev => [...prev, newParticle])
-    } else if (draggedParticleType === 'electron') {
+    } else if (type === 'electron') {
       setElectrons(prev => [...prev, newParticle])
     }
 
-    setDraggedParticleType(null)
-  }, [draggedParticleType])
-
-  const handleCancelPlacement = useCallback(() => {
-    setDraggedParticleType(null)
+    // Immediately select the new particle
+    setSelectedIds(new Set([newId]))
   }, [])
 
   const handleDragStart = useCallback((leaderId) => {
@@ -291,9 +283,6 @@ function App() {
         onProtonRotationChange={handleProtonRotationChange}
         onNeutronRotationChange={handleNeutronRotationChange}
         onElectronRotationChange={handleElectronRotationChange}
-        draggedParticleType={draggedParticleType}
-        onPlaceParticle={handlePlaceParticle}
-        onCancelPlacement={handleCancelPlacement}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       />
@@ -304,7 +293,6 @@ function App() {
         onProtonChange={handleProtonCountChange}
         onNeutronChange={handleNeutronCountChange}
         onAddParticleStart={handleAddParticleStart}
-        draggedParticleType={draggedParticleType}
         onSetElement={handleSetElement}
         onDeleteSelected={handleDeleteSelected}
         onReset={handleReset}

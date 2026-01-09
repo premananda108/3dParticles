@@ -14,8 +14,7 @@ export default function ControlPanel({
     onSetElement,
     onReset,
     onDeleteSelected,
-    onAddParticleStart,
-    draggedParticleType
+    onAddParticleStart
 }) {
     const handleElementSelect = (element) => {
         if (onSetElement) {
@@ -53,7 +52,7 @@ export default function ControlPanel({
 
                 <div className="particle-tool-group">
                     <div
-                        className={`particle-tool proton-tool ${draggedParticleType === 'proton' ? 'active' : ''}`}
+                        className="particle-tool proton-tool"
                         onClick={() => onAddParticleStart('proton')}
                         title="Кликните, чтобы добавить протон"
                     >
@@ -62,7 +61,7 @@ export default function ControlPanel({
                     </div>
 
                     <div
-                        className={`particle-tool neutron-tool ${draggedParticleType === 'neutron' ? 'active' : ''}`}
+                        className="particle-tool neutron-tool"
                         onClick={() => onAddParticleStart('neutron')}
                         title="Кликните, чтобы добавить нейтрон"
                     >
@@ -71,7 +70,7 @@ export default function ControlPanel({
                     </div>
 
                     <div
-                        className={`particle-tool electron-tool ${draggedParticleType === 'electron' ? 'active' : ''}`}
+                        className="particle-tool electron-tool"
                         onClick={() => onAddParticleStart('electron')}
                         title="Кликните, чтобы добавить электрон"
                     >

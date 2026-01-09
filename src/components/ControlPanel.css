@@ -227,27 +227,52 @@ h2 {
   letter-spacing: 0.5px;
 }
 
-/* Reset Button */
+/* Reset and Delete Buttons */
 .reset-section {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 12px;
   margin-top: 10px;
 }
 
-.reset-btn {
-  width: 100%;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.reset-btn,
+.delete-btn {
+  padding: 12px 10px;
   border-radius: 12px;
   color: white;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.reset-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .reset-btn:hover {
   background: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.2);
+}
+
+.delete-btn {
+  background: rgba(255, 80, 80, 0.1);
+  border: 1px solid rgba(255, 80, 80, 0.2);
+  color: #ff8080;
+}
+
+.delete-btn.active:hover {
+  background: rgba(255, 80, 80, 0.25);
+  border-color: rgba(255, 80, 80, 0.4);
+  transform: translateY(-1px);
+}
+
+.delete-btn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  filter: grayscale(1);
 }
 
 /* Elements Grid */

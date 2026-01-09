@@ -8,10 +8,12 @@ const ELEMENTS = [
 export default function ControlPanel({
     protonCount,
     neutronCount,
+    selectedCount = 0,
     onProtonChange,
     onNeutronChange,
     onSetElement,
     onReset,
+    onDeleteSelected,
     onAddParticleStart,
     draggedParticleType
 }) {
@@ -79,8 +81,15 @@ export default function ControlPanel({
                 </div>
 
                 <div className="reset-section">
+                    <button
+                        className={`delete-btn ${selectedCount > 0 ? 'active' : 'disabled'}`}
+                        onClick={onDeleteSelected}
+                        disabled={selectedCount === 0}
+                    >
+                        🗑️ Удалить ({selectedCount})
+                    </button>
                     <button className="reset-btn" onClick={onReset}>
-                        🔄 Сбросить сцену
+                        🔄 Сбросить
                     </button>
                 </div>
             </div>
@@ -121,10 +130,10 @@ export default function ControlPanel({
             </div>
 
             <div className="instructions">
-                <p>➕ <b>Добавление</b>: Кликните "Добавить..." и разместите частицу в сцене</p>
-                <p>✋ <b>Перемещение</b>: ЛКМ + Drag на частице</p>
-                <p>🔄 <b>Вращение частицы</b>: ПКМ + Drag на частице</p>
-                <p>🖱️ <b>Вращение сцены</b>: Drag на пустом месте</p>
+                <p>🖱️ <b>Выбор</b>: ЛКМ (Ctrl/Cmd для группы)</p>
+                <p>✋ <b>Перемещение</b>: Drag на выделенной частице</p>
+                <p>🗑️ <b>Удаление</b>: Клавиша <b>Del</b> или кнопка в меню</p>
+                <p>🔄 <b>Вращение частицы</b>: ПКМ + Drag</p>
             </div>
         </div>
     )

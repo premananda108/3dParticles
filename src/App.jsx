@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import AtomScene from './components/AtomScene'
 import ControlPanel from './components/ControlPanel'
 import './App.css'
@@ -210,6 +210,31 @@ function App() {
     setSelectedIds(new Set())
   }, [])
 
+  const handleDeleteSelected = useCallback(() => {
+    if (selectedIds.size === 0) return
+
+    setProtons(prev => prev.filter(p => !selectedIds.has(p.id)))
+    setNeutrons(prev => prev.filter(n => !selectedIds.has(n.id)))
+    setElectrons(prev => prev.filter(e => !selectedIds.has(e.id)))
+    setSelectedIds(new Set())
+  }, [selectedIds])
+
+  // Global keyboard listener for Delete key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        // Prevent accidental navigation back in some browsers on Backspace
+        // only if focus is not in an input/textarea
+        if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+          handleDeleteSelected()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleDeleteSelected])
+
   const handleReset = useCallback(() => {
     setProtons([{ id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0] }])
     setNeutrons([])
@@ -275,11 +300,13 @@ function App() {
       <ControlPanel
         protonCount={protons.length}
         neutronCount={neutrons.length}
+        selectedCount={selectedIds.size}
         onProtonChange={handleProtonCountChange}
         onNeutronChange={handleNeutronCountChange}
         onAddParticleStart={handleAddParticleStart}
         draggedParticleType={draggedParticleType}
         onSetElement={handleSetElement}
+        onDeleteSelected={handleDeleteSelected}
         onReset={handleReset}
       />
     </div>

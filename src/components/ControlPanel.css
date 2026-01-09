@@ -136,7 +136,7 @@ h2 {
 }
 
 .neutron-tool {
-  color: #4ecdc4;
+  color: #726e6e;
 }
 
 .proton-tool.active {
@@ -145,8 +145,8 @@ h2 {
 }
 
 .neutron-tool.active {
-  border-color: #4ecdc4;
-  box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
+  border-color: #626060;
+  box-shadow: 0 0 15px rgba(187, 187, 187, 0.3);
 }
 
 .electron-tool {
@@ -185,8 +185,8 @@ h2 {
 }
 
 .neutron-icon {
-  background: radial-gradient(circle at 30% 30%, #7eece4, #4ecdc4);
-  box-shadow: 0 0 20px rgba(78, 205, 196, 0.4);
+  background: radial-gradient(circle at 30% 30%, #b9b3b3, #474242);
+  box-shadow: 0 0 20px rgba(105, 100, 100, 0.4);
 }
 
 .neutron-icon::after {
@@ -274,7 +274,7 @@ h2 {
 }
 
 .element-btn:hover {
-  background: linear-gradient(135deg, rgba(78, 205, 196, 0.3), rgba(255, 107, 107, 0.3));
+  background: linear-gradient(135deg, rgba(187, 187, 187, 0.3), rgba(255, 107, 107, 0.3));
   transform: scale(1.05);
   border-color: rgba(255, 255, 255, 0.2);
 }
@@ -315,8 +315,8 @@ h2 {
 }
 
 .neutron-color {
-  background: #4ecdc4;
-  color: #4ecdc4;
+  background: #bbbbbb;
+  color: #bbbbbb;
 }
 
 .electron-color {

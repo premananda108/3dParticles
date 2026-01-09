@@ -7,11 +7,11 @@ export default function Neutron() {
         <mesh ref={meshRef}>
             <torusGeometry args={[0.35, 0.15, 24, 48]} />
             <meshStandardMaterial
-                color="#4488ff"
-                emissive="#2266dd"
-                emissiveIntensity={0.3}
-                roughness={0.2}
-                metalness={0.8}
+                color="#bbbbbb"
+                emissive="#444444"
+                emissiveIntensity={0.2}
+                roughness={0.4}
+                metalness={0.4}
             />
         </mesh>
     )

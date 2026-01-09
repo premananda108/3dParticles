@@ -20,8 +20,8 @@ export default function Electron() {
             */}
             <torusGeometry args={[0.8, 0.75, 32, 64]} />
             <meshPhysicalMaterial
-                color="#aaddff" // Lighter blue
-                emissive="#4488bb"
+                color="#b5caefff"
+                emissive="#2266dd"
                 emissiveIntensity={0.2} // Lower emission to see inside better
                 transparent={true}
                 opacity={0.3} // More transparent to see enveloped protons

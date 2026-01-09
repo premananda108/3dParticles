@@ -11,7 +11,7 @@ export default function DraggableParticle({
     children,
     id,
     rotation = [0, 0, 0],
-    positionStep = 0.5,
+    positionStep = 0.3,
     rotationStep = Math.PI / 12, // 15 degrees
     isSelected = false,
     onSelect,

@@ -42,7 +42,7 @@ export default function ParticlePlacer({
 
             if (intersection) {
                 // Snap to grid
-                const step = 0.5
+                const step = 0.3
                 const snapToGrid = (val) => Math.round(val / step) * step
 
                 intersection.x = snapToGrid(intersection.x)

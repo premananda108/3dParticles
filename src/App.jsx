@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import AtomScene from './components/AtomScene'
 import ControlPanel from './components/ControlPanel'
 import './App.css'
@@ -48,8 +48,11 @@ function App() {
   ])
   const [neutrons, setNeutrons] = useState([])
   const [electrons, setElectrons] = useState([])
-
+  const [selectedIds, setSelectedIds] = useState(new Set())
   const [draggedParticleType, setDraggedParticleType] = useState(null)
+
+  // Snapshot to store initial positions relative to leader at start of drag
+  const dragSnapshot = useRef(null)
 
   const handleProtonCountChange = useCallback((newCount) => {
     setProtons(prev => {
@@ -97,17 +100,81 @@ function App() {
     setDraggedParticleType(null)
   }, [])
 
-  const handleProtonPositionChange = useCallback((id, newPosition) => {
-    setProtons(prev => prev.map(p =>
-      p.id === id ? { ...p, position: newPosition } : p
-    ))
+  const handleDragStart = useCallback((leaderId) => {
+    // 1. Find the leader
+    const allParticles = [...protons, ...neutrons, ...electrons]
+    const leader = allParticles.find(p => p.id === leaderId)
+
+    if (!leader) return
+
+    // 2. Snapshot positions of ALL selected particles
+    const snapshot = {
+      leaderId,
+      initialLeaderPos: [...leader.position],
+      particles: {}
+    }
+
+    // Store initial positions for all selected particles
+    allParticles.forEach(p => {
+      if (selectedIds.has(p.id)) {
+        snapshot.particles[p.id] = [...p.position]
+      }
+    })
+
+    dragSnapshot.current = snapshot
+  }, [protons, neutrons, electrons, selectedIds])
+
+  const handleDragEnd = useCallback(() => {
+    dragSnapshot.current = null
   }, [])
 
-  const handleNeutronPositionChange = useCallback((id, newPosition) => {
-    setNeutrons(prev => prev.map(n =>
-      n.id === id ? { ...n, position: newPosition } : n
-    ))
+  // Helper to update position for a group of selected particles
+  const handleBatchMove = useCallback((leaderId, newPosition) => {
+    if (!dragSnapshot.current || dragSnapshot.current.leaderId !== leaderId) {
+      return
+    }
+
+    const { initialLeaderPos, particles } = dragSnapshot.current
+
+    // Calculate total delta from start of drag
+    const deltaX = newPosition[0] - initialLeaderPos[0]
+    const deltaY = newPosition[1] - initialLeaderPos[1]
+    const deltaZ = newPosition[2] - initialLeaderPos[2]
+
+    // Function to update a specific array if it contains particles in the snapshot
+    const updateArray = (arr) => arr.map(p => {
+      // Check if this particle is in our snapshot
+      if (particles[p.id]) {
+        const initialPos = particles[p.id]
+        return {
+          ...p,
+          position: [
+            initialPos[0] + deltaX,
+            initialPos[1] + deltaY,
+            initialPos[2] + deltaZ
+          ]
+        }
+      }
+      return p
+    })
+
+    setProtons(prev => updateArray(prev))
+    setNeutrons(prev => updateArray(prev))
+    setElectrons(prev => updateArray(prev))
+
   }, [])
+
+  const handleProtonPositionChange = useCallback((id, newPosition) => {
+    handleBatchMove(id, newPosition)
+  }, [handleBatchMove])
+
+  const handleNeutronPositionChange = useCallback((id, newPosition) => {
+    handleBatchMove(id, newPosition)
+  }, [handleBatchMove])
+
+  const handleElectronPositionChange = useCallback((id, newPosition) => {
+    handleBatchMove(id, newPosition)
+  }, [handleBatchMove])
 
   const handleProtonRotationChange = useCallback((id, newRotation) => {
     setProtons(prev => prev.map(p =>
@@ -121,22 +188,33 @@ function App() {
     ))
   }, [])
 
-  const handleElectronPositionChange = useCallback((id, newPosition) => {
-    setElectrons(prev => prev.map(e =>
-      e.id === id ? { ...e, position: newPosition } : e
-    ))
-  }, [])
-
   const handleElectronRotationChange = useCallback((id, newRotation) => {
     setElectrons(prev => prev.map(e =>
       e.id === id ? { ...e, rotation: newRotation } : e
     ))
   }, [])
 
+  const handleSelectParticle = useCallback((id, isMultiSelect) => {
+    setSelectedIds(prev => {
+      const newSelected = new Set(isMultiSelect ? prev : [])
+      if (newSelected.has(id)) {
+        newSelected.delete(id)
+      } else {
+        newSelected.add(id)
+      }
+      return newSelected
+    })
+  }, [])
+
+  const handleDeselectAll = useCallback(() => {
+    setSelectedIds(new Set())
+  }, [])
+
   const handleReset = useCallback(() => {
     setProtons([{ id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0] }])
     setNeutrons([])
     setElectrons([])
+    setSelectedIds(new Set())
   }, [])
 
   // Set specific element configuration
@@ -179,6 +257,9 @@ function App() {
         protons={protons}
         neutrons={neutrons}
         electrons={electrons}
+        selectedIds={selectedIds}
+        onSelectParticle={handleSelectParticle}
+        onDeselectAll={handleDeselectAll}
         onProtonPositionChange={handleProtonPositionChange}
         onNeutronPositionChange={handleNeutronPositionChange}
         onElectronPositionChange={handleElectronPositionChange}
@@ -188,6 +269,8 @@ function App() {
         draggedParticleType={draggedParticleType}
         onPlaceParticle={handlePlaceParticle}
         onCancelPlacement={handleCancelPlacement}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
       />
       <ControlPanel
         protonCount={protons.length}

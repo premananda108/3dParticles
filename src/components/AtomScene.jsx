@@ -14,10 +14,71 @@ export function useDragContext() {
     return useContext(DragContext)
 }
 
+export default function AtomScene({
+    protons,
+    neutrons,
+    electrons,
+    selectedIds,
+    onSelectParticle,
+    onDeselectAll,
+    onProtonPositionChange,
+    onNeutronPositionChange,
+    onElectronPositionChange,
+    onProtonRotationChange,
+    onNeutronRotationChange,
+    onElectronRotationChange,
+    draggedParticleType,
+    onPlaceParticle,
+    onCancelPlacement,
+    onDragStart,
+    onDragEnd
+}) {
+    const [isDragging, setIsDragging] = useState(false)
+
+    return (
+        <div className="scene-container">
+            <DragContext.Provider value={{ isDragging, setIsDragging }}>
+                <Canvas
+                    camera={{ position: [0, 0, 10], fov: 50 }}
+                    gl={{ antialias: true }}
+                    onPointerMissed={(e) => {
+                        // Only deselect if we clicked on the background (type 'click')
+                        if (e.type === 'click') {
+                            onDeselectAll && onDeselectAll()
+                        }
+                    }}
+                >
+                    <SceneContent
+                        protons={protons}
+                        neutrons={neutrons}
+                        electrons={electrons}
+                        selectedIds={selectedIds}
+                        onSelectParticle={onSelectParticle}
+                        onProtonPositionChange={onProtonPositionChange}
+                        onNeutronPositionChange={onNeutronPositionChange}
+                        onElectronPositionChange={onElectronPositionChange}
+                        onProtonRotationChange={onProtonRotationChange}
+                        onNeutronRotationChange={onNeutronRotationChange}
+                        onElectronRotationChange={onElectronRotationChange}
+                        isDragging={isDragging}
+                        draggedParticleType={draggedParticleType}
+                        onPlaceParticle={onPlaceParticle}
+                        onCancelPlacement={onCancelPlacement}
+                        onDragStart={onDragStart}
+                        onDragEnd={onDragEnd}
+                    />
+                </Canvas>
+            </DragContext.Provider>
+        </div>
+    )
+}
+
 function SceneContent({
     protons,
     neutrons,
     electrons,
+    selectedIds,
+    onSelectParticle,
     onProtonPositionChange,
     onNeutronPositionChange,
     onElectronPositionChange,
@@ -27,7 +88,9 @@ function SceneContent({
     isDragging,
     draggedParticleType,
     onPlaceParticle,
-    onCancelPlacement
+    onCancelPlacement,
+    onDragStart,
+    onDragEnd
 }) {
     const controlsRef = useRef()
 
@@ -58,12 +121,16 @@ function SceneContent({
                 protons={protons}
                 neutrons={neutrons}
                 electrons={electrons}
+                selectedIds={selectedIds}
+                onSelectParticle={onSelectParticle}
                 onProtonPositionChange={onProtonPositionChange}
                 onNeutronPositionChange={onNeutronPositionChange}
                 onElectronPositionChange={onElectronPositionChange}
                 onProtonRotationChange={onProtonRotationChange}
                 onNeutronRotationChange={onNeutronRotationChange}
                 onElectronRotationChange={onElectronRotationChange}
+                onDragStart={onDragStart}
+                onDragEnd={onDragEnd}
             />
 
             {/* Ghost particle for placement */}
@@ -87,49 +154,5 @@ function SceneContent({
                 maxDistance={30}
             />
         </>
-    )
-}
-
-export default function AtomScene({
-    protons,
-    neutrons,
-    electrons,
-    onProtonPositionChange,
-    onNeutronPositionChange,
-    onElectronPositionChange,
-    onProtonRotationChange,
-    onNeutronRotationChange,
-    onElectronRotationChange,
-    draggedParticleType,
-    onPlaceParticle,
-    onCancelPlacement
-}) {
-    const [isDragging, setIsDragging] = useState(false)
-
-    return (
-        <div className="scene-container">
-            <DragContext.Provider value={{ isDragging, setIsDragging }}>
-                <Canvas
-                    camera={{ position: [0, 0, 10], fov: 50 }}
-                    gl={{ antialias: true }}
-                >
-                    <SceneContent
-                        protons={protons}
-                        neutrons={neutrons}
-                        electrons={electrons}
-                        onProtonPositionChange={onProtonPositionChange}
-                        onNeutronPositionChange={onNeutronPositionChange}
-                        onElectronPositionChange={onElectronPositionChange}
-                        onProtonRotationChange={onProtonRotationChange}
-                        onNeutronRotationChange={onNeutronRotationChange}
-                        onElectronRotationChange={onElectronRotationChange}
-                        isDragging={isDragging}
-                        draggedParticleType={draggedParticleType}
-                        onPlaceParticle={onPlaceParticle}
-                        onCancelPlacement={onCancelPlacement}
-                    />
-                </Canvas>
-            </DragContext.Provider>
-        </div>
     )
 }

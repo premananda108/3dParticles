@@ -7,12 +7,16 @@ export default function Nucleus({
     protons,
     neutrons,
     electrons,
+    selectedIds,
+    onSelectParticle,
     onProtonPositionChange,
     onNeutronPositionChange,
     onElectronPositionChange,
     onProtonRotationChange,
     onNeutronRotationChange,
-    onElectronRotationChange
+    onElectronRotationChange,
+    onDragStart,
+    onDragEnd
 }) {
     return (
         <group>
@@ -24,6 +28,10 @@ export default function Nucleus({
                     rotation={particle.rotation}
                     onPositionChange={onProtonPositionChange}
                     onRotationChange={onProtonRotationChange}
+                    isSelected={selectedIds?.has(particle.id)}
+                    onSelect={onSelectParticle}
+                    onDragStart={onDragStart}
+                    onDragEnd={onDragEnd}
                 >
                     <Proton />
                 </DraggableParticle>
@@ -36,6 +44,10 @@ export default function Nucleus({
                     rotation={particle.rotation}
                     onPositionChange={onNeutronPositionChange}
                     onRotationChange={onNeutronRotationChange}
+                    isSelected={selectedIds?.has(particle.id)}
+                    onSelect={onSelectParticle}
+                    onDragStart={onDragStart}
+                    onDragEnd={onDragEnd}
                 >
                     <Neutron />
                 </DraggableParticle>
@@ -48,6 +60,10 @@ export default function Nucleus({
                     rotation={particle.rotation}
                     onPositionChange={onElectronPositionChange}
                     onRotationChange={onElectronRotationChange}
+                    isSelected={selectedIds?.has(particle.id)}
+                    onSelect={onSelectParticle}
+                    onDragStart={onDragStart}
+                    onDragEnd={onDragEnd}
                 >
                     <Electron />
                 </DraggableParticle>

@@ -23,9 +23,11 @@ export default function AtomScene({
     const [transformMode, setTransformMode] = useState('translate')
 
     const handleSelect = (particleId, isMultiSelect) => {
+        // If the clicked particle is already the active one, toggle transform mode
         if (activeParticle === particleId && !isMultiSelect) {
             setTransformMode(prev => prev === 'translate' ? 'rotate' : 'translate')
         } else {
+        // Otherwise, set the new particle as active and default to translate mode
             setActiveParticle(particleId)
             setTransformMode('translate')
         }
@@ -113,6 +115,8 @@ function SceneContent({
         const { position, rotation } = e.target.object
         const id = e.target.object.userData.id
 
+        // This function finds the particle by its ID and calls the appropriate
+        // updater function (for position or rotation) based on the current transform mode.
         const findAndCallUpdater = (particles, posUpdater, rotUpdater) => {
             const p = particles.find(p => p.id === id)
             if (p) {

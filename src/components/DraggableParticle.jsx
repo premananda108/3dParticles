@@ -53,7 +53,7 @@ export default function DraggableParticle({
             <group
                 ref={innerRef}
                 scale={isSelected ? 1.15 : (isHovered ? 1.05 : 1)}
-                rotation={rotation}
+                rotation={rotation} // Rotation is applied here from the parent state
             >
                 {children}
                 {isSelected && (

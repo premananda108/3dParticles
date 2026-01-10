@@ -93,6 +93,12 @@ function SceneContent({
     const [isDragging, setIsDragging] = useState(false)
 
     useEffect(() => {
+        if (controlsRef.current) {
+            controlsRef.current.enabled = !isDragging;
+        }
+    }, [isDragging]);
+
+    useEffect(() => {
         if (activeParticle && sceneRef.current) {
             const object = sceneRef.current.getObjectByName(activeParticle)
             setSelectedObject(object)
@@ -174,7 +180,6 @@ function SceneContent({
             {/* Camera controls - disabled when dragging particles */}
             <OrbitControls
                 ref={controlsRef}
-                enabled={!isDragging}
                 enablePan={true}
                 enableZoom={true}
                 enableRotate={true}

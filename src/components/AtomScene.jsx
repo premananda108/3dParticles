@@ -92,13 +92,6 @@ function SceneContent({
     const controlsRef = useRef()
     const sceneRef = useRef()
     const [selectedObject, setSelectedObject] = useState(null)
-    const [isDragging, setIsDragging] = useState(false)
-
-    useEffect(() => {
-        if (controlsRef.current) {
-            controlsRef.current.enabled = !isDragging;
-        }
-    }, [isDragging]);
 
     useEffect(() => {
         if (activeParticle && sceneRef.current) {
@@ -177,7 +170,11 @@ function SceneContent({
                     object={selectedObject}
                     mode={transformMode}
                     onObjectChange={handleTransform}
-                    onDraggingChanged={(e) => setIsDragging(e.value)}
+                    onDraggingChanged={(e) => {
+                        if (controlsRef.current) {
+                            controlsRef.current.enabled = !e.value
+                        }
+                    }}
                 />
             )}
 

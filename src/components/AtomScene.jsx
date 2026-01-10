@@ -100,6 +100,12 @@ function SceneContent({
     const [selectedObject, setSelectedObject] = useState(null)
 
     useEffect(() => {
+        if (controlsRef.current) {
+            controlsRef.current.enabled = !isDragging;
+        }
+    }, [isDragging]);
+
+    useEffect(() => {
         if (activeParticle && sceneRef.current) {
             const object = sceneRef.current.getObjectByName(activeParticle)
             setSelectedObject(object)

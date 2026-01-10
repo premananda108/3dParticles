@@ -49,7 +49,6 @@ function App() {
   const [neutrons, setNeutrons] = useState([])
   const [electrons, setElectrons] = useState([])
   const [selectedIds, setSelectedIds] = useState(new Set())
-  const [draggedParticleType, setDraggedParticleType] = useState(null)
 
   // Snapshot to store initial positions relative to leader at start of drag
   const dragSnapshot = useRef(null)

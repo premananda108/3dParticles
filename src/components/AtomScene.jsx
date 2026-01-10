@@ -1,17 +1,8 @@
-import { useState, useRef, createContext, useContext } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Stars, Environment } from '@react-three/drei'
+import { OrbitControls, Stars, Environment, TransformControls } from '@react-three/drei'
 import Nucleus from './Nucleus'
-
-// Context to control OrbitControls from child components
-export const DragContext = createContext({
-    isDragging: false,
-    setIsDragging: () => { }
-})
-
-export function useDragContext() {
-    return useContext(DragContext)
-}
+import { DragContext } from '../contexts/DragContext'
 
 export default function AtomScene({
     protons,
@@ -30,6 +21,23 @@ export default function AtomScene({
     onDragEnd
 }) {
     const [isDragging, setIsDragging] = useState(false)
+    const [activeParticle, setActiveParticle] = useState(null)
+    const [transformMode, setTransformMode] = useState('translate')
+
+    const handleSelect = (particleId, isMultiSelect) => {
+        if (activeParticle === particleId && !isMultiSelect) {
+            setTransformMode(prev => prev === 'translate' ? 'rotate' : 'translate')
+        } else {
+            setActiveParticle(particleId)
+            setTransformMode('translate')
+        }
+        onSelectParticle(particleId, isMultiSelect)
+    }
+
+    const handleDeselectAll = () => {
+        setActiveParticle(null)
+        onDeselectAll()
+    }
 
     return (
         <div className="scene-container">
@@ -38,9 +46,8 @@ export default function AtomScene({
                     camera={{ position: [0, 0, 10], fov: 50 }}
                     gl={{ antialias: true }}
                     onPointerMissed={(e) => {
-                        // Only deselect if we clicked on the background (type 'click')
                         if (e.type === 'click') {
-                            onDeselectAll && onDeselectAll()
+                            handleDeselectAll()
                         }
                     }}
                 >
@@ -49,7 +56,9 @@ export default function AtomScene({
                         neutrons={neutrons}
                         electrons={electrons}
                         selectedIds={selectedIds}
-                        onSelectParticle={onSelectParticle}
+                        activeParticle={activeParticle}
+                        transformMode={transformMode}
+                        onSelectParticle={handleSelect}
                         onProtonPositionChange={onProtonPositionChange}
                         onNeutronPositionChange={onNeutronPositionChange}
                         onElectronPositionChange={onElectronPositionChange}
@@ -59,6 +68,7 @@ export default function AtomScene({
                         isDragging={isDragging}
                         onDragStart={onDragStart}
                         onDragEnd={onDragEnd}
+                        setIsDragging={setIsDragging}
                     />
                 </Canvas>
             </DragContext.Provider>
@@ -71,6 +81,8 @@ function SceneContent({
     neutrons,
     electrons,
     selectedIds,
+    activeParticle,
+    transformMode,
     onSelectParticle,
     onProtonPositionChange,
     onNeutronPositionChange,
@@ -80,12 +92,46 @@ function SceneContent({
     onElectronRotationChange,
     isDragging,
     onDragStart,
-    onDragEnd
+    onDragEnd,
+    setIsDragging
 }) {
     const controlsRef = useRef()
+    const sceneRef = useRef()
+    const [selectedObject, setSelectedObject] = useState(null)
+
+    useEffect(() => {
+        if (activeParticle && sceneRef.current) {
+            const object = sceneRef.current.getObjectByName(activeParticle)
+            setSelectedObject(object)
+        } else {
+            setSelectedObject(null)
+        }
+    }, [activeParticle])
+
+    const handleTransform = (e) => {
+        if (!e.target.object) return
+
+        const { position, rotation } = e.target.object
+        const id = e.target.object.userData.id
+
+        const findAndCallUpdater = (particles, posUpdater, rotUpdater) => {
+            const p = particles.find(p => p.id === id)
+            if (p) {
+                if (transformMode === 'translate') {
+                    posUpdater(id, [position.x, position.y, position.z])
+                } else {
+                    rotUpdater(id, [rotation.x, rotation.y, rotation.z])
+                }
+            }
+        }
+
+        findAndCallUpdater(protons, onProtonPositionChange, onProtonRotationChange)
+        findAndCallUpdater(neutrons, onNeutronPositionChange, onNeutronRotationChange)
+        findAndCallUpdater(electrons, onElectronPositionChange, onElectronRotationChange)
+    }
 
     return (
-        <>
+        <group ref={sceneRef}>
             {/* Background stars */}
             <Stars
                 radius={100}
@@ -123,6 +169,15 @@ function SceneContent({
                 onDragEnd={onDragEnd}
             />
 
+            {selectedObject && (
+                <TransformControls
+                    object={selectedObject}
+                    mode={transformMode}
+                    onObjectChange={handleTransform}
+                    onDraggingChanged={(e) => setIsDragging(e.value)}
+                />
+            )}
+
             {/* Camera controls - disabled when dragging particles */}
             <OrbitControls
                 ref={controlsRef}
@@ -134,6 +189,6 @@ function SceneContent({
                 minDistance={3}
                 maxDistance={30}
             />
-        </>
+        </group>
     )
 }

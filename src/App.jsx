@@ -227,6 +227,13 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleDeleteSelected])
 
+  // Global listener to disable context menu
+  useEffect(() => {
+    const handleContextMenu = (e) => e.preventDefault()
+    window.addEventListener('contextmenu', handleContextMenu)
+    return () => window.removeEventListener('contextmenu', handleContextMenu)
+  }, [])
+
   const handleReset = useCallback(() => {
     setProtons([{ id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0] }])
     setNeutrons([])

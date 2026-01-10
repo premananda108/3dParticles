@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars, Environment, TransformControls } from '@react-three/drei'
 import Nucleus from './Nucleus'
-import { DragContext } from '../contexts/DragContext'
 
 export default function AtomScene({
     protons,
@@ -20,7 +19,6 @@ export default function AtomScene({
     onDragStart,
     onDragEnd
 }) {
-    const [isDragging, setIsDragging] = useState(false)
     const [activeParticle, setActiveParticle] = useState(null)
     const [transformMode, setTransformMode] = useState('translate')
 
@@ -41,10 +39,9 @@ export default function AtomScene({
 
     return (
         <div className="scene-container">
-            <DragContext.Provider value={{ isDragging, setIsDragging }}>
-                <Canvas
-                    camera={{ position: [0, 0, 10], fov: 50 }}
-                    gl={{ antialias: true }}
+            <Canvas
+                camera={{ position: [0, 0, 10], fov: 50 }}
+                gl={{ antialias: true }}
                     onPointerMissed={(e) => {
                         if (e.type === 'click') {
                             handleDeselectAll()
@@ -65,13 +62,10 @@ export default function AtomScene({
                         onProtonRotationChange={onProtonRotationChange}
                         onNeutronRotationChange={onNeutronRotationChange}
                         onElectronRotationChange={onElectronRotationChange}
-                        isDragging={isDragging}
                         onDragStart={onDragStart}
                         onDragEnd={onDragEnd}
-                        setIsDragging={setIsDragging}
                     />
                 </Canvas>
-            </DragContext.Provider>
         </div>
     )
 }
@@ -90,20 +84,13 @@ function SceneContent({
     onProtonRotationChange,
     onNeutronRotationChange,
     onElectronRotationChange,
-    isDragging,
     onDragStart,
-    onDragEnd,
-    setIsDragging
+    onDragEnd
 }) {
     const controlsRef = useRef()
     const sceneRef = useRef()
     const [selectedObject, setSelectedObject] = useState(null)
-
-    useEffect(() => {
-        if (controlsRef.current) {
-            controlsRef.current.enabled = !isDragging;
-        }
-    }, [isDragging]);
+    const [isDragging, setIsDragging] = useState(false)
 
     useEffect(() => {
         if (activeParticle && sceneRef.current) {

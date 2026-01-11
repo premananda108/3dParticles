@@ -188,6 +188,7 @@ function SceneContent({
                 autoRotate={false}
                 minDistance={3}
                 maxDistance={30}
+                mouseButtons={{ LEFT: null, MIDDLE: 2, RIGHT: 0 }}
             />
         </group>
     )

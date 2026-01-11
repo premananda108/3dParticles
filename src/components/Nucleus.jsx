@@ -41,6 +41,7 @@ export default function Nucleus({
                 <DraggableParticle
                     key={particle.id}
                     id={particle.id}
+                    name={particle.id}
                     position={particle.position}
                     rotation={particle.rotation}
                     onPositionChange={onNeutronPositionChange}

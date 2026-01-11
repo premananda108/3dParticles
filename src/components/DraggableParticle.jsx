@@ -1,5 +1,6 @@
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useContext } from 'react'
 import { Outlines } from '@react-three/drei'
+import { DragContext } from '../contexts/DragContext'
 
 export default function DraggableParticle({
     position,
@@ -13,15 +14,16 @@ export default function DraggableParticle({
     const groupRef = useRef()
     const innerRef = useRef()
     const [isHovered, setIsHovered] = useState(false)
+    const { isDragging } = useContext(DragContext)
 
     const handlePointerDown = useCallback((e) => {
-        if (e.button !== 0) return;
+        if (e.button !== 0 || isDragging) return;
         e.stopPropagation();
         const isMulti = e.metaKey || e.ctrlKey;
         if (onSelect) {
             onSelect(id, isMulti);
         }
-    }, [id, onSelect]);
+    }, [id, onSelect, isDragging]);
 
     const handlePointerOver = useCallback((e) => {
         e.stopPropagation()

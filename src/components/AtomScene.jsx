@@ -39,6 +39,16 @@ export default function AtomScene({
         onDeselectAll()
     }
 
+    // Auto-activate gizmo when exactly one particle is selected (e.g., when added)
+    useEffect(() => {
+        if (selectedIds && selectedIds.size === 1) {
+            const firstId = Array.from(selectedIds)[0]
+            if (activeParticle !== firstId) {
+                setActiveParticle(firstId)
+            }
+        }
+    }, [selectedIds, activeParticle])
+
     return (
         <div className="scene-container">
             <DragContext.Provider value={{ isDragging, setIsDragging }}>

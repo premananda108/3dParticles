@@ -53,25 +53,89 @@ function App() {
   // Snapshot to store initial positions relative to leader at start of drag
   const dragSnapshot = useRef(null)
 
+  // Undo/Redo history
+  const historyRef = useRef({
+    past: [],
+    future: []
+  })
+  const MAX_HISTORY = 50
+
+  // Save current state to history before making changes
+  const saveSnapshot = useCallback(() => {
+    const snapshot = {
+      protons: JSON.parse(JSON.stringify(protons)),
+      neutrons: JSON.parse(JSON.stringify(neutrons)),
+      electrons: JSON.parse(JSON.stringify(electrons))
+    }
+    historyRef.current.past.push(snapshot)
+    if (historyRef.current.past.length > MAX_HISTORY) {
+      historyRef.current.past.shift()
+    }
+    historyRef.current.future = [] // Clear redo stack on new action
+  }, [protons, neutrons, electrons])
+
+  // Undo last action
+  const undo = useCallback(() => {
+    if (historyRef.current.past.length === 0) return
+
+    // Save current state to future for redo
+    const current = {
+      protons: JSON.parse(JSON.stringify(protons)),
+      neutrons: JSON.parse(JSON.stringify(neutrons)),
+      electrons: JSON.parse(JSON.stringify(electrons))
+    }
+    historyRef.current.future.push(current)
+
+    // Restore previous state
+    const prev = historyRef.current.past.pop()
+    setProtons(prev.protons)
+    setNeutrons(prev.neutrons)
+    setElectrons(prev.electrons)
+    setSelectedIds(new Set())
+  }, [protons, neutrons, electrons])
+
+  // Redo last undone action
+  const redo = useCallback(() => {
+    if (historyRef.current.future.length === 0) return
+
+    // Save current state to past
+    const current = {
+      protons: JSON.parse(JSON.stringify(protons)),
+      neutrons: JSON.parse(JSON.stringify(neutrons)),
+      electrons: JSON.parse(JSON.stringify(electrons))
+    }
+    historyRef.current.past.push(current)
+
+    // Restore future state
+    const next = historyRef.current.future.pop()
+    setProtons(next.protons)
+    setNeutrons(next.neutrons)
+    setElectrons(next.electrons)
+    setSelectedIds(new Set())
+  }, [protons, neutrons, electrons])
+
   const handleProtonCountChange = useCallback((newCount) => {
+    saveSnapshot()
     setProtons(prev => {
       if (newCount > prev.length) {
         return generateClusterPositions(newCount, prev)
       }
       return prev.slice(0, newCount)
     })
-  }, [])
+  }, [saveSnapshot])
 
   const handleNeutronCountChange = useCallback((newCount) => {
+    saveSnapshot()
     setNeutrons(prev => {
       if (newCount > prev.length) {
         return generateClusterPositions(newCount, prev)
       }
       return prev.slice(0, newCount)
     })
-  }, [])
+  }, [saveSnapshot])
 
   const handleAddParticleStart = useCallback((type) => {
+    saveSnapshot()
     const newId = `${type}-${Date.now()}`
     const newParticle = {
       id: newId,
@@ -89,7 +153,7 @@ function App() {
 
     // Immediately select the new particle
     setSelectedIds(new Set([newId]))
-  }, [])
+  }, [saveSnapshot])
 
   const handleDragStart = useCallback((leaderId) => {
     console.log('App: handleDragStart', leaderId)
@@ -133,6 +197,9 @@ function App() {
         console.log('App: handleBatchMove - leader not found', leaderId)
         return
       }
+
+      // Save to history BEFORE modifying positions
+      saveSnapshot()
 
       // Create snapshot now
       const snapshot = {
@@ -179,7 +246,7 @@ function App() {
     setNeutrons(prev => updateArray(prev))
     setElectrons(prev => updateArray(prev))
 
-  }, [protons, neutrons, electrons, selectedIds])
+  }, [protons, neutrons, electrons, selectedIds, saveSnapshot])
 
   const handleProtonPositionChange = useCallback((id, newPosition) => {
     handleBatchMove(id, newPosition)
@@ -229,16 +296,28 @@ function App() {
 
   const handleDeleteSelected = useCallback(() => {
     if (selectedIds.size === 0) return
-
+    saveSnapshot()
     setProtons(prev => prev.filter(p => !selectedIds.has(p.id)))
     setNeutrons(prev => prev.filter(n => !selectedIds.has(n.id)))
     setElectrons(prev => prev.filter(e => !selectedIds.has(e.id)))
     setSelectedIds(new Set())
-  }, [selectedIds])
+  }, [selectedIds, saveSnapshot])
 
-  // Global keyboard listener for Delete key
+  // Global keyboard listener for Delete key and Undo/Redo
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Undo: Cmd+Z or Ctrl+Z
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        undo()
+        return
+      }
+      // Redo: Cmd+Shift+Z or Ctrl+Shift+Z
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && e.shiftKey) {
+        e.preventDefault()
+        redo()
+        return
+      }
       if (e.key === 'Delete' || e.key === 'Backspace') {
         // Prevent accidental navigation back in some browsers on Backspace
         // only if focus is not in an input/textarea
@@ -250,7 +329,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleDeleteSelected])
+  }, [handleDeleteSelected, undo, redo])
 
   // Global listener to disable context menu
   useEffect(() => {
@@ -260,14 +339,16 @@ function App() {
   }, [])
 
   const handleReset = useCallback(() => {
+    saveSnapshot()
     setProtons([{ id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0] }])
     setNeutrons([])
     setElectrons([])
     setSelectedIds(new Set())
-  }, [])
+  }, [saveSnapshot])
 
   // Set specific element configuration
   const handleSetElement = useCallback((protonCount, neutronCount, electronCount = 0) => {
+    saveSnapshot()
     let newProtons = []
 
     // For single proton (Hydrogen), place it exactly at center to match electron
@@ -298,7 +379,7 @@ function App() {
     setProtons(newProtons)
     setNeutrons(newNeutrons)
     setElectrons(newElectrons)
-  }, [])
+  }, [saveSnapshot])
 
   return (
     <div className="app">

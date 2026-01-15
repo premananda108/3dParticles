@@ -92,6 +92,7 @@ function App() {
   }, [])
 
   const handleDragStart = useCallback((leaderId) => {
+    console.log('App: handleDragStart', leaderId)
     // 1. Find the leader
     const allParticles = [...protons, ...neutrons, ...electrons]
     const leader = allParticles.find(p => p.id === leaderId)
@@ -112,17 +113,42 @@ function App() {
       }
     })
 
+    console.log('App: Created snapshot', snapshot)
     dragSnapshot.current = snapshot
   }, [protons, neutrons, electrons, selectedIds])
 
   const handleDragEnd = useCallback(() => {
+    console.log('App: handleDragEnd')
     dragSnapshot.current = null
   }, [])
 
   // Helper to update position for a group of selected particles
   const handleBatchMove = useCallback((leaderId, newPosition) => {
+    // Lazily create snapshot on first move if it doesn't exist
     if (!dragSnapshot.current || dragSnapshot.current.leaderId !== leaderId) {
-      return
+      const allParticles = [...protons, ...neutrons, ...electrons]
+      const leader = allParticles.find(p => p.id === leaderId)
+
+      if (!leader) {
+        console.log('App: handleBatchMove - leader not found', leaderId)
+        return
+      }
+
+      // Create snapshot now
+      const snapshot = {
+        leaderId,
+        initialLeaderPos: [...leader.position],
+        particles: {}
+      }
+
+      allParticles.forEach(p => {
+        if (selectedIds.has(p.id)) {
+          snapshot.particles[p.id] = [...p.position]
+        }
+      })
+
+      console.log('App: handleBatchMove - created snapshot lazily', snapshot)
+      dragSnapshot.current = snapshot
     }
 
     const { initialLeaderPos, particles } = dragSnapshot.current
@@ -153,7 +179,7 @@ function App() {
     setNeutrons(prev => updateArray(prev))
     setElectrons(prev => updateArray(prev))
 
-  }, [])
+  }, [protons, neutrons, electrons, selectedIds])
 
   const handleProtonPositionChange = useCallback((id, newPosition) => {
     handleBatchMove(id, newPosition)

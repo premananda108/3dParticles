@@ -184,7 +184,15 @@ function SceneContent({
                     object={selectedObject}
                     mode={transformMode}
                     onObjectChange={handleTransform}
-                    onDraggingChanged={(e) => setIsDragging(e.value)}
+                    onDraggingChanged={(e) => {
+                        console.log('TransformControls dragging changed:', e.value, 'activeParticle:', activeParticle)
+                        setIsDragging(e.value)
+                        if (e.value) {
+                            onDragStart(activeParticle)
+                        } else {
+                            onDragEnd()
+                        }
+                    }}
                 />
             )}
 

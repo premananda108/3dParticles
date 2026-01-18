@@ -145,7 +145,8 @@ function App() {
     const newParticle = {
       id: newId,
       position: [0, 0, 0],
-      rotation: [0, 0, 0]
+      rotation: [0, 0, 0],
+      scale: [1, 1, 1]
     }
 
     if (type === 'proton') {
@@ -301,6 +302,30 @@ function App() {
     ))
   }, [])
 
+  const handleProtonScaleChange = useCallback((id, newScale) => {
+    setProtons(prev => prev.map(p =>
+      p.id === id ? { ...p, scale: newScale } : p
+    ))
+  }, [])
+
+  const handleNeutronScaleChange = useCallback((id, newScale) => {
+    setNeutrons(prev => prev.map(n =>
+      n.id === id ? { ...n, scale: newScale } : n
+    ))
+  }, [])
+
+  const handleElectronScaleChange = useCallback((id, newScale) => {
+    setElectrons(prev => prev.map(e =>
+      e.id === id ? { ...e, scale: newScale } : e
+    ))
+  }, [])
+
+  const handleArrowScaleChange = useCallback((id, newScale) => {
+    setArrows(prev => prev.map(a =>
+      a.id === id ? { ...a, scale: newScale } : a
+    ))
+  }, [])
+
   const handleSelectParticle = useCallback((id, isMultiSelect) => {
     setSelectedIds(prev => {
       const newSelected = new Set(isMultiSelect ? prev : [])
@@ -426,6 +451,10 @@ function App() {
         arrows={arrows} // [NEW] Pass arrows to AtomScene
         onArrowPositionChange={handleArrowPositionChange}
         onArrowRotationChange={handleArrowRotationChange}
+        onProtonScaleChange={handleProtonScaleChange}
+        onNeutronScaleChange={handleNeutronScaleChange}
+        onElectronScaleChange={handleElectronScaleChange}
+        onArrowScaleChange={handleArrowScaleChange}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       />

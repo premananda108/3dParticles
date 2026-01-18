@@ -8,6 +8,7 @@ export default function DraggableParticle({
     id,
     name,
     rotation = [0, 0, 0],
+    scale = [1, 1, 1],
     isSelected = false,
     onSelect
 }) {
@@ -39,6 +40,7 @@ export default function DraggableParticle({
             name={name}
             userData={{ id }}
             position={position}
+            scale={scale}
             onPointerDown={handlePointerDown}
 
             onContextMenu={handleContextMenu}

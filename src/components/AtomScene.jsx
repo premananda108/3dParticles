@@ -23,6 +23,10 @@ export default function AtomScene({
     onElectronRotationChange,
     onArrowPositionChange,
     onArrowRotationChange,
+    onProtonScaleChange,
+    onNeutronScaleChange,
+    onElectronScaleChange,
+    onArrowScaleChange,
     onDragStart,
     onDragEnd
 }) {
@@ -32,7 +36,11 @@ export default function AtomScene({
 
     const handleSelect = (particleId, isMultiSelect) => {
         if (activeParticle === particleId && !isMultiSelect) {
-            setTransformMode(prev => prev === 'translate' ? 'rotate' : 'translate')
+            setTransformMode(prev => {
+                if (prev === 'translate') return 'rotate'
+                if (prev === 'rotate') return 'scale'
+                return 'translate'
+            })
         } else {
             setActiveParticle(particleId)
             setTransformMode('translate')
@@ -83,6 +91,10 @@ export default function AtomScene({
                     arrows={arrows}
                     onArrowPositionChange={onArrowPositionChange}
                     onArrowRotationChange={onArrowRotationChange}
+                    onProtonScaleChange={onProtonScaleChange}
+                    onNeutronScaleChange={onNeutronScaleChange}
+                    onElectronScaleChange={onElectronScaleChange}
+                    onArrowScaleChange={onArrowScaleChange}
                     isDragging={isDragging}
                     onDragStart={onDragStart}
                     onDragEnd={onDragEnd}
@@ -110,6 +122,10 @@ function SceneContent({
     onElectronRotationChange,
     onArrowPositionChange,
     onArrowRotationChange,
+    onProtonScaleChange,
+    onNeutronScaleChange,
+    onElectronScaleChange,
+    onArrowScaleChange,
     isDragging,
     onDragStart,
     onDragEnd,
@@ -145,22 +161,24 @@ function SceneContent({
         const { position, rotation } = e.target.object
         const id = e.target.object.userData.id
 
-        const findAndCallUpdater = (particles, posUpdater, rotUpdater) => {
+        const findAndCallUpdater = (particles, posUpdater, rotUpdater, scaleUpdater) => {
             const p = particles.find(p => p.id === id)
             if (p) {
                 if (transformMode === 'translate') {
                     posUpdater(id, [position.x, position.y, position.z])
-                } else {
+                } else if (transformMode === 'rotate') {
                     rotUpdater(id, [rotation.x, rotation.y, rotation.z])
+                } else if (transformMode === 'scale') {
+                    scaleUpdater(id, [e.target.object.scale.x, e.target.object.scale.y, e.target.object.scale.z])
                 }
             }
         }
 
-        findAndCallUpdater(protons, onProtonPositionChange, onProtonRotationChange)
-        findAndCallUpdater(neutrons, onNeutronPositionChange, onNeutronRotationChange)
+        findAndCallUpdater(protons, onProtonPositionChange, onProtonRotationChange, onProtonScaleChange)
+        findAndCallUpdater(neutrons, onNeutronPositionChange, onNeutronRotationChange, onNeutronScaleChange)
 
-        findAndCallUpdater(electrons, onElectronPositionChange, onElectronRotationChange)
-        findAndCallUpdater(arrows, onArrowPositionChange, onArrowRotationChange)
+        findAndCallUpdater(electrons, onElectronPositionChange, onElectronRotationChange, onElectronScaleChange)
+        findAndCallUpdater(arrows, onArrowPositionChange, onArrowRotationChange, onArrowScaleChange)
     }
 
     return (
@@ -199,6 +217,9 @@ function SceneContent({
                     onProtonRotationChange={onProtonRotationChange}
                     onNeutronRotationChange={onNeutronRotationChange}
                     onElectronRotationChange={onElectronRotationChange}
+                    onProtonScaleChange={onProtonScaleChange}
+                    onNeutronScaleChange={onNeutronScaleChange}
+                    onElectronScaleChange={onElectronScaleChange}
                     onDragStart={onDragStart}
                     onDragEnd={onDragEnd}
                 />
@@ -211,8 +232,10 @@ function SceneContent({
                         name={arrow.id}
                         position={arrow.position}
                         rotation={arrow.rotation}
+                        scale={arrow.scale}
                         onPositionChange={onArrowPositionChange}
                         onRotationChange={onArrowRotationChange}
+                        onScaleChange={onArrowScaleChange}
                         isSelected={selectedIds?.has(arrow.id)}
                         onSelect={onSelectParticle}
                         onDragStart={onDragStart}

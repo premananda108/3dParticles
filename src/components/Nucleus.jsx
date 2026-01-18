@@ -15,6 +15,9 @@ export default function Nucleus({
     onProtonRotationChange,
     onNeutronRotationChange,
     onElectronRotationChange,
+    onProtonScaleChange,
+    onNeutronScaleChange,
+    onElectronScaleChange,
     onDragStart,
     onDragEnd
 }) {
@@ -27,8 +30,10 @@ export default function Nucleus({
                     name={particle.id}
                     position={particle.position}
                     rotation={particle.rotation}
+                    scale={particle.scale}
                     onPositionChange={onProtonPositionChange}
                     onRotationChange={onProtonRotationChange}
+                    onScaleChange={onProtonScaleChange}
                     isSelected={selectedIds?.has(particle.id)}
                     onSelect={onSelectParticle}
                     onDragStart={onDragStart}
@@ -44,8 +49,10 @@ export default function Nucleus({
                     name={particle.id}
                     position={particle.position}
                     rotation={particle.rotation}
+                    scale={particle.scale}
                     onPositionChange={onNeutronPositionChange}
                     onRotationChange={onNeutronRotationChange}
+                    onScaleChange={onNeutronScaleChange}
                     isSelected={selectedIds?.has(particle.id)}
                     onSelect={onSelectParticle}
                     onDragStart={onDragStart}
@@ -61,8 +68,10 @@ export default function Nucleus({
                     name={particle.id}
                     position={particle.position}
                     rotation={particle.rotation}
+                    scale={particle.scale}
                     onPositionChange={onElectronPositionChange}
                     onRotationChange={onElectronRotationChange}
+                    onScaleChange={onElectronScaleChange}
                     isSelected={selectedIds?.has(particle.id)}
                     onSelect={onSelectParticle}
                     onDragStart={onDragStart}

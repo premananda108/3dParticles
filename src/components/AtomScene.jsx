@@ -152,6 +152,8 @@ function SceneContent({
     useFrame(() => {
         if (transformRef.current) {
             gizmoHoveredRef.current = !!transformRef.current.axis
+        } else {
+            gizmoHoveredRef.current = false
         }
     })
 

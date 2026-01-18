@@ -23,7 +23,7 @@ export default function CurvedArrow() {
         <group>
             <mesh geometry={tubeGeometry}>
                 <meshStandardMaterial
-                    color="#EEEEEE"
+                    color="#ffffff"
                     roughness={0.3}
                     metalness={0.2}
                 />

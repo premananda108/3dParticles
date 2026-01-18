@@ -18,7 +18,10 @@ export default function DraggableParticle({
     const { isDragging, gizmoHoveredRef } = useContext(DragContext)
 
     const handlePointerDown = useCallback((e) => {
-        if (e.button !== 0 || isDragging || (gizmoHoveredRef && gizmoHoveredRef.current)) return;
+        if (e.button !== 0 || isDragging || (gizmoHoveredRef && gizmoHoveredRef.current)) {
+            console.log('Selection blocked:', { isDragging, gizmoHovered: gizmoHoveredRef?.current })
+            return;
+        }
         e.stopPropagation();
         const isMulti = e.metaKey || e.ctrlKey;
         if (onSelect) {

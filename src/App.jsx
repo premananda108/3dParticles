@@ -188,8 +188,10 @@ function App() {
 
   // Helper to update position for a group of selected particles
   const handleBatchMove = useCallback((leaderId, newPosition) => {
-    // Lazily create snapshot on first move if it doesn't exist
-    if (!dragSnapshot.current || dragSnapshot.current.leaderId !== leaderId) {
+    // Lazily create snapshot on first move if it doesn't exist or if selection count mismatches
+    if (!dragSnapshot.current ||
+      dragSnapshot.current.leaderId !== leaderId ||
+      Object.keys(dragSnapshot.current.particles).length !== selectedIds.size) {
       const allParticles = [...protons, ...neutrons, ...electrons]
       const leader = allParticles.find(p => p.id === leaderId)
 

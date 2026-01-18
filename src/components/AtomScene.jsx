@@ -107,9 +107,11 @@ function SceneContent({
     const sceneRef = useRef()
     const transformRef = useRef()
     const gizmoHoveredRef = useRef(false)
+    const activeParticleRef = useRef(activeParticle)
     const [selectedObject, setSelectedObject] = useState(null)
 
     useEffect(() => {
+        activeParticleRef.current = activeParticle
         if (activeParticle && sceneRef.current) {
             const object = sceneRef.current.getObjectByName(activeParticle)
             setSelectedObject(object)
@@ -193,10 +195,10 @@ function SceneContent({
                         mode={transformMode}
                         onObjectChange={handleTransform}
                         onDraggingChanged={(e) => {
-                            console.log('TransformControls dragging changed:', e.value, 'activeParticle:', activeParticle)
+                            console.log('TransformControls dragging changed:', e.value, 'activeParticle:', activeParticleRef.current)
                             setIsDragging(e.value)
                             if (e.value) {
-                                onDragStart(activeParticle)
+                                onDragStart(activeParticleRef.current)
                             } else {
                                 onDragEnd()
                             }

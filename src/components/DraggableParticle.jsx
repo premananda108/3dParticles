@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useContext } from 'react'
+import { useRef, useCallback, useContext } from 'react'
 import { Outlines } from '@react-three/drei'
 import { DragContext } from '../contexts/DragContext'
 
@@ -13,11 +13,11 @@ export default function DraggableParticle({
 }) {
     const groupRef = useRef()
     const innerRef = useRef()
-    const [isHovered, setIsHovered] = useState(false)
-    const { isDragging } = useContext(DragContext)
+
+    const { isDragging, gizmoHoveredRef } = useContext(DragContext)
 
     const handlePointerDown = useCallback((e) => {
-        if (e.button !== 0 || isDragging) return;
+        if (e.button !== 0 || isDragging || (gizmoHoveredRef && gizmoHoveredRef.current)) return;
         e.stopPropagation();
         const isMulti = e.metaKey || e.ctrlKey;
         if (onSelect) {
@@ -25,15 +25,7 @@ export default function DraggableParticle({
         }
     }, [id, onSelect, isDragging]);
 
-    const handlePointerOver = useCallback((e) => {
-        e.stopPropagation()
-        setIsHovered(true)
-    }, [])
 
-    const handlePointerOut = useCallback((e) => {
-        e.stopPropagation()
-        setIsHovered(false)
-    }, [])
 
     // Prevent context menu on right-click
     const handleContextMenu = useCallback((e) => {
@@ -48,13 +40,12 @@ export default function DraggableParticle({
             userData={{ id }}
             position={position}
             onPointerDown={handlePointerDown}
-            onPointerOver={handlePointerOver}
-            onPointerOut={handlePointerOut}
+
             onContextMenu={handleContextMenu}
         >
             <group
                 ref={innerRef}
-                scale={isSelected ? 1.15 : (isHovered ? 1.05 : 1)}
+                scale={isSelected ? 1.15 : 1}
                 rotation={rotation}
             >
                 {children}

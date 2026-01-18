@@ -2,7 +2,8 @@ import { createContext, useContext } from 'react';
 
 export const DragContext = createContext({
     isDragging: false,
-    setIsDragging: () => { }
+    setIsDragging: () => { },
+    gizmoHoveredRef: { current: false }
 });
 
 export function useDragContext() {

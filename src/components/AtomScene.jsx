@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Stars, Environment, TransformControls } from '@react-three/drei'
 import Nucleus from './Nucleus'
 import { DragContext } from '../contexts/DragContext'
@@ -51,37 +51,35 @@ export default function AtomScene({
 
     return (
         <div className="scene-container">
-            <DragContext.Provider value={{ isDragging, setIsDragging }}>
-                <Canvas
-                    camera={{ position: [0, 0, 10], fov: 50 }}
-                    gl={{ antialias: true }}
-                    onPointerMissed={(e) => {
-                        if (e.type === 'click') {
-                            handleDeselectAll()
-                        }
-                    }}
-                >
-                    <SceneContent
-                        protons={protons}
-                        neutrons={neutrons}
-                        electrons={electrons}
-                        selectedIds={selectedIds}
-                        activeParticle={activeParticle}
-                        transformMode={transformMode}
-                        onSelectParticle={handleSelect}
-                        onProtonPositionChange={onProtonPositionChange}
-                        onNeutronPositionChange={onNeutronPositionChange}
-                        onElectronPositionChange={onElectronPositionChange}
-                        onProtonRotationChange={onProtonRotationChange}
-                        onNeutronRotationChange={onNeutronRotationChange}
-                        onElectronRotationChange={onElectronRotationChange}
-                        isDragging={isDragging}
-                        onDragStart={onDragStart}
-                        onDragEnd={onDragEnd}
-                        setIsDragging={setIsDragging}
-                    />
-                </Canvas>
-            </DragContext.Provider>
+            <Canvas
+                camera={{ position: [0, 0, 10], fov: 50 }}
+                gl={{ antialias: true }}
+                onPointerMissed={(e) => {
+                    if (e.type === 'click') {
+                        handleDeselectAll()
+                    }
+                }}
+            >
+                <SceneContent
+                    protons={protons}
+                    neutrons={neutrons}
+                    electrons={electrons}
+                    selectedIds={selectedIds}
+                    activeParticle={activeParticle}
+                    transformMode={transformMode}
+                    onSelectParticle={handleSelect}
+                    onProtonPositionChange={onProtonPositionChange}
+                    onNeutronPositionChange={onNeutronPositionChange}
+                    onElectronPositionChange={onElectronPositionChange}
+                    onProtonRotationChange={onProtonRotationChange}
+                    onNeutronRotationChange={onNeutronRotationChange}
+                    onElectronRotationChange={onElectronRotationChange}
+                    isDragging={isDragging}
+                    onDragStart={onDragStart}
+                    onDragEnd={onDragEnd}
+                    setIsDragging={setIsDragging}
+                />
+            </Canvas>
         </div>
     )
 }
@@ -107,6 +105,8 @@ function SceneContent({
 }) {
     const controlsRef = useRef()
     const sceneRef = useRef()
+    const transformRef = useRef()
+    const gizmoHoveredRef = useRef(false)
     const [selectedObject, setSelectedObject] = useState(null)
 
     useEffect(() => {
@@ -117,6 +117,12 @@ function SceneContent({
             setSelectedObject(null)
         }
     }, [activeParticle])
+
+    useFrame(() => {
+        if (transformRef.current) {
+            gizmoHoveredRef.current = !!transformRef.current.axis
+        }
+    })
 
     const handleTransform = (e) => {
         if (!e.target.object) return
@@ -162,39 +168,42 @@ function SceneContent({
             {/* Environment for reflections */}
             <Environment preset="night" />
 
-            {/* The nucleus */}
-            <Nucleus
-                protons={protons}
-                neutrons={neutrons}
-                electrons={electrons}
-                selectedIds={selectedIds}
-                onSelectParticle={onSelectParticle}
-                onProtonPositionChange={onProtonPositionChange}
-                onNeutronPositionChange={onNeutronPositionChange}
-                onElectronPositionChange={onElectronPositionChange}
-                onProtonRotationChange={onProtonRotationChange}
-                onNeutronRotationChange={onNeutronRotationChange}
-                onElectronRotationChange={onElectronRotationChange}
-                onDragStart={onDragStart}
-                onDragEnd={onDragEnd}
-            />
-
-            {selectedObject && (
-                <TransformControls
-                    object={selectedObject}
-                    mode={transformMode}
-                    onObjectChange={handleTransform}
-                    onDraggingChanged={(e) => {
-                        console.log('TransformControls dragging changed:', e.value, 'activeParticle:', activeParticle)
-                        setIsDragging(e.value)
-                        if (e.value) {
-                            onDragStart(activeParticle)
-                        } else {
-                            onDragEnd()
-                        }
-                    }}
+            <DragContext.Provider value={{ isDragging, setIsDragging, gizmoHoveredRef }}>
+                {/* The nucleus */}
+                <Nucleus
+                    protons={protons}
+                    neutrons={neutrons}
+                    electrons={electrons}
+                    selectedIds={selectedIds}
+                    onSelectParticle={onSelectParticle}
+                    onProtonPositionChange={onProtonPositionChange}
+                    onNeutronPositionChange={onNeutronPositionChange}
+                    onElectronPositionChange={onElectronPositionChange}
+                    onProtonRotationChange={onProtonRotationChange}
+                    onNeutronRotationChange={onNeutronRotationChange}
+                    onElectronRotationChange={onElectronRotationChange}
+                    onDragStart={onDragStart}
+                    onDragEnd={onDragEnd}
                 />
-            )}
+
+                {selectedObject && (
+                    <TransformControls
+                        ref={transformRef}
+                        object={selectedObject}
+                        mode={transformMode}
+                        onObjectChange={handleTransform}
+                        onDraggingChanged={(e) => {
+                            console.log('TransformControls dragging changed:', e.value, 'activeParticle:', activeParticle)
+                            setIsDragging(e.value)
+                            if (e.value) {
+                                onDragStart(activeParticle)
+                            } else {
+                                onDragEnd()
+                            }
+                        }}
+                    />
+                )}
+            </DragContext.Provider>
 
             {/* Camera controls - disabled when dragging particles */}
             <OrbitControls

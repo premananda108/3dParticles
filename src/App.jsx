@@ -48,6 +48,7 @@ function App() {
   ])
   const [neutrons, setNeutrons] = useState([])
   const [electrons, setElectrons] = useState([])
+  const [arrows, setArrows] = useState([])
   const [selectedIds, setSelectedIds] = useState(new Set())
 
   // Snapshot to store initial positions relative to leader at start of drag
@@ -65,14 +66,16 @@ function App() {
     const snapshot = {
       protons: JSON.parse(JSON.stringify(protons)),
       neutrons: JSON.parse(JSON.stringify(neutrons)),
-      electrons: JSON.parse(JSON.stringify(electrons))
+
+      electrons: JSON.parse(JSON.stringify(electrons)),
+      arrows: JSON.parse(JSON.stringify(arrows))
     }
     historyRef.current.past.push(snapshot)
     if (historyRef.current.past.length > MAX_HISTORY) {
       historyRef.current.past.shift()
     }
     historyRef.current.future = [] // Clear redo stack on new action
-  }, [protons, neutrons, electrons])
+  }, [protons, neutrons, electrons, arrows])
 
   // Undo last action
   const undo = useCallback(() => {
@@ -91,8 +94,9 @@ function App() {
     setProtons(prev.protons)
     setNeutrons(prev.neutrons)
     setElectrons(prev.electrons)
+    setArrows(prev.arrows || [])
     setSelectedIds(new Set())
-  }, [protons, neutrons, electrons])
+  }, [protons, neutrons, electrons, arrows])
 
   // Redo last undone action
   const redo = useCallback(() => {
@@ -111,8 +115,9 @@ function App() {
     setProtons(next.protons)
     setNeutrons(next.neutrons)
     setElectrons(next.electrons)
+    setArrows(next.arrows || [])
     setSelectedIds(new Set())
-  }, [protons, neutrons, electrons])
+  }, [protons, neutrons, electrons, arrows])
 
   const handleProtonCountChange = useCallback((newCount) => {
     saveSnapshot()
@@ -148,7 +153,11 @@ function App() {
     } else if (type === 'neutron') {
       setNeutrons(prev => [...prev, newParticle])
     } else if (type === 'electron') {
+
       setElectrons(prev => [...prev, newParticle])
+    } else if (type === 'arrow') {
+      console.log('App: Adding arrow')
+      setArrows(prev => [...prev, newParticle])
     }
 
     // Immediately select the new particle
@@ -158,7 +167,7 @@ function App() {
   const handleDragStart = useCallback((leaderId) => {
     console.log('App: handleDragStart', leaderId)
     // 1. Find the leader
-    const allParticles = [...protons, ...neutrons, ...electrons]
+    const allParticles = [...protons, ...neutrons, ...electrons, ...arrows]
     const leader = allParticles.find(p => p.id === leaderId)
 
     if (!leader) return
@@ -246,9 +255,11 @@ function App() {
 
     setProtons(prev => updateArray(prev))
     setNeutrons(prev => updateArray(prev))
-    setElectrons(prev => updateArray(prev))
 
-  }, [protons, neutrons, electrons, selectedIds, saveSnapshot])
+    setElectrons(prev => updateArray(prev))
+    setArrows(prev => updateArray(prev))
+
+  }, [protons, neutrons, electrons, arrows, selectedIds, saveSnapshot])
 
   const handleProtonPositionChange = useCallback((id, newPosition) => {
     handleBatchMove(id, newPosition)
@@ -259,6 +270,10 @@ function App() {
   }, [handleBatchMove])
 
   const handleElectronPositionChange = useCallback((id, newPosition) => {
+    handleBatchMove(id, newPosition)
+  }, [handleBatchMove])
+
+  const handleArrowPositionChange = useCallback((id, newPosition) => {
     handleBatchMove(id, newPosition)
   }, [handleBatchMove])
 
@@ -277,6 +292,12 @@ function App() {
   const handleElectronRotationChange = useCallback((id, newRotation) => {
     setElectrons(prev => prev.map(e =>
       e.id === id ? { ...e, rotation: newRotation } : e
+    ))
+  }, [])
+
+  const handleArrowRotationChange = useCallback((id, newRotation) => {
+    setArrows(prev => prev.map(a =>
+      a.id === id ? { ...a, rotation: newRotation } : a
     ))
   }, [])
 
@@ -302,6 +323,7 @@ function App() {
     setProtons(prev => prev.filter(p => !selectedIds.has(p.id)))
     setNeutrons(prev => prev.filter(n => !selectedIds.has(n.id)))
     setElectrons(prev => prev.filter(e => !selectedIds.has(e.id)))
+    setArrows(prev => prev.filter(a => !selectedIds.has(a.id)))
     setSelectedIds(new Set())
   }, [selectedIds, saveSnapshot])
 
@@ -344,7 +366,9 @@ function App() {
     saveSnapshot()
     setProtons([{ id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0] }])
     setNeutrons([])
+
     setElectrons([])
+    setArrows([])
     setSelectedIds(new Set())
   }, [saveSnapshot])
 
@@ -381,6 +405,7 @@ function App() {
     setProtons(newProtons)
     setNeutrons(newNeutrons)
     setElectrons(newElectrons)
+    setArrows([]) // Reset arrows on element set
   }, [saveSnapshot])
 
   return (
@@ -398,6 +423,9 @@ function App() {
         onProtonRotationChange={handleProtonRotationChange}
         onNeutronRotationChange={handleNeutronRotationChange}
         onElectronRotationChange={handleElectronRotationChange}
+        arrows={arrows} // [NEW] Pass arrows to AtomScene
+        onArrowPositionChange={handleArrowPositionChange}
+        onArrowRotationChange={handleArrowRotationChange}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       />

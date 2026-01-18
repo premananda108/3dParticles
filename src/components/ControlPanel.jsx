@@ -77,6 +77,14 @@ export default function ControlPanel({
                         <div className="tool-icon electron-icon"></div>
                         <span>Добавить Электрон</span>
                     </div>
+                    <div
+                        className="particle-tool arrow-tool"
+                        onClick={() => onAddParticleStart('arrow')}
+                        title="Кликните, чтобы добавить стрелку"
+                    >
+                        <div className="tool-icon arrow-icon">↗️</div>
+                        <span>Добавить Стрелку</span>
+                    </div>
                 </div>
 
                 <div className="reset-section">
@@ -124,6 +132,10 @@ export default function ControlPanel({
                     <div className="legend-item">
                         <span className="legend-color electron-color"></span>
                         <span>Электрон</span>
+                    </div>
+                    <div className="legend-item">
+                        <span className="legend-color arrow-color">↗️</span>
+                        <span>Стрелка</span>
                     </div>
                 </div>
             </div>

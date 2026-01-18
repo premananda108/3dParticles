@@ -3,11 +3,15 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Stars, Environment, TransformControls } from '@react-three/drei'
 import Nucleus from './Nucleus'
 import { DragContext } from '../contexts/DragContext'
+import DraggableParticle from './DraggableParticle'
+import CurvedArrow from './CurvedArrow'
 
 export default function AtomScene({
     protons,
     neutrons,
+
     electrons,
+    arrows,
     selectedIds,
     onSelectParticle,
     onDeselectAll,
@@ -17,6 +21,8 @@ export default function AtomScene({
     onProtonRotationChange,
     onNeutronRotationChange,
     onElectronRotationChange,
+    onArrowPositionChange,
+    onArrowRotationChange,
     onDragStart,
     onDragEnd
 }) {
@@ -74,6 +80,9 @@ export default function AtomScene({
                     onProtonRotationChange={onProtonRotationChange}
                     onNeutronRotationChange={onNeutronRotationChange}
                     onElectronRotationChange={onElectronRotationChange}
+                    arrows={arrows}
+                    onArrowPositionChange={onArrowPositionChange}
+                    onArrowRotationChange={onArrowRotationChange}
                     isDragging={isDragging}
                     onDragStart={onDragStart}
                     onDragEnd={onDragEnd}
@@ -88,6 +97,7 @@ function SceneContent({
     protons,
     neutrons,
     electrons,
+    arrows,
     selectedIds,
     activeParticle,
     transformMode,
@@ -98,6 +108,8 @@ function SceneContent({
     onProtonRotationChange,
     onNeutronRotationChange,
     onElectronRotationChange,
+    onArrowPositionChange,
+    onArrowRotationChange,
     isDragging,
     onDragStart,
     onDragEnd,
@@ -111,6 +123,7 @@ function SceneContent({
     const [selectedObject, setSelectedObject] = useState(null)
 
     useEffect(() => {
+        console.log('SceneContent: arrows prop', arrows)
         activeParticleRef.current = activeParticle
         if (activeParticle && sceneRef.current) {
             const object = sceneRef.current.getObjectByName(activeParticle)
@@ -145,7 +158,9 @@ function SceneContent({
 
         findAndCallUpdater(protons, onProtonPositionChange, onProtonRotationChange)
         findAndCallUpdater(neutrons, onNeutronPositionChange, onNeutronRotationChange)
+
         findAndCallUpdater(electrons, onElectronPositionChange, onElectronRotationChange)
+        findAndCallUpdater(arrows, onArrowPositionChange, onArrowRotationChange)
     }
 
     return (
@@ -187,6 +202,25 @@ function SceneContent({
                     onDragStart={onDragStart}
                     onDragEnd={onDragEnd}
                 />
+
+                {/* Arrows */}
+                {arrows?.map((arrow) => (
+                    <DraggableParticle
+                        key={arrow.id}
+                        id={arrow.id}
+                        name={arrow.id}
+                        position={arrow.position}
+                        rotation={arrow.rotation}
+                        onPositionChange={onArrowPositionChange}
+                        onRotationChange={onArrowRotationChange}
+                        isSelected={selectedIds?.has(arrow.id)}
+                        onSelect={onSelectParticle}
+                        onDragStart={onDragStart}
+                        onDragEnd={onDragEnd}
+                    >
+                        <CurvedArrow />
+                    </DraggableParticle>
+                ))}
 
                 {selectedObject && (
                     <TransformControls

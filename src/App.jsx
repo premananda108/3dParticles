@@ -201,7 +201,7 @@ function App() {
     if (!dragSnapshot.current ||
       dragSnapshot.current.leaderId !== leaderId ||
       Object.keys(dragSnapshot.current.particles).length !== selectedIds.size) {
-      const allParticles = [...protons, ...neutrons, ...electrons]
+      const allParticles = [...protons, ...neutrons, ...electrons, ...arrows]
       const leader = allParticles.find(p => p.id === leaderId)
 
       if (!leader) {

@@ -23,14 +23,14 @@ export default function CurvedArrow() {
         <group>
             <mesh geometry={tubeGeometry}>
                 <meshStandardMaterial
-                    color="#ffffff"
+                    color="#00ccff"
                     roughness={0.3}
                     metalness={0.2}
                 />
             </mesh>
             <mesh geometry={coneGeometry}>
                 <meshStandardMaterial
-                    color="#EEEEEE"
+                    color="#00ccff"
                     roughness={0.3}
                     metalness={0.2}
                 />

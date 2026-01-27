@@ -239,7 +239,14 @@ function App() {
 
     // Function to update a specific array if it contains particles in the snapshot
     const updateArray = (arr) => arr.map(p => {
-      // Check if this particle is in our snapshot
+      // Leader gets the exact new position (already moved by gizmo)
+      if (p.id === leaderId) {
+        return {
+          ...p,
+          position: [...newPosition]
+        }
+      }
+      // Other selected particles get the delta applied
       if (particles[p.id]) {
         const initialPos = particles[p.id]
         return {
@@ -352,7 +359,67 @@ function App() {
     setSelectedIds(new Set())
   }, [selectedIds, saveSnapshot])
 
-  // Global keyboard listener for Delete key and Undo/Redo
+  // Duplicate selected elements
+  const handleDuplicateSelected = useCallback(() => {
+    if (selectedIds.size === 0) return
+    saveSnapshot()
+
+    const offset = 0.5 // Offset for duplicated elements
+    const newSelectedIds = new Set()
+
+    // Helper to duplicate a particle with offset
+    const duplicateParticle = (particle) => {
+      const newId = `${particle.id.split('-')[0]}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      newSelectedIds.add(newId)
+      return {
+        ...particle,
+        id: newId,
+        position: [
+          particle.position[0] + offset,
+          particle.position[1] + offset,
+          particle.position[2]
+        ],
+        rotation: particle.rotation ? [...particle.rotation] : [0, 0, 0],
+        scale: particle.scale ? [...particle.scale] : [1, 1, 1]
+      }
+    }
+
+    // Duplicate selected protons
+    setProtons(prev => {
+      const toDuplicate = prev.filter(p => selectedIds.has(p.id))
+      const duplicated = toDuplicate.map(duplicateParticle)
+      return [...prev, ...duplicated]
+    })
+
+    // Duplicate selected neutrons
+    setNeutrons(prev => {
+      const toDuplicate = prev.filter(n => selectedIds.has(n.id))
+      const duplicated = toDuplicate.map(duplicateParticle)
+      return [...prev, ...duplicated]
+    })
+
+    // Duplicate selected electrons
+    setElectrons(prev => {
+      const toDuplicate = prev.filter(e => selectedIds.has(e.id))
+      const duplicated = toDuplicate.map(duplicateParticle)
+      return [...prev, ...duplicated]
+    })
+
+    // Duplicate selected arrows
+    setArrows(prev => {
+      const toDuplicate = prev.filter(a => selectedIds.has(a.id))
+      const duplicated = toDuplicate.map(duplicateParticle)
+      return [...prev, ...duplicated]
+    })
+
+    // Select newly duplicated elements
+    setSelectedIds(newSelectedIds)
+
+    // Clear drag snapshot to prevent stale position data
+    dragSnapshot.current = null
+  }, [selectedIds, saveSnapshot])
+
+  // Global keyboard listener for Delete key, Undo/Redo, and Duplicate
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Undo: Cmd+Z or Ctrl+Z
@@ -367,6 +434,12 @@ function App() {
         redo()
         return
       }
+      // Duplicate: Cmd+D or Ctrl+D
+      if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
+        e.preventDefault()
+        handleDuplicateSelected()
+        return
+      }
       if (e.key === 'Delete' || e.key === 'Backspace') {
         // Prevent accidental navigation back in some browsers on Backspace
         // only if focus is not in an input/textarea
@@ -378,7 +451,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleDeleteSelected, undo, redo])
+  }, [handleDeleteSelected, handleDuplicateSelected, undo, redo])
 
   // Global listener to disable context menu
   useEffect(() => {

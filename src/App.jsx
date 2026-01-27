@@ -269,69 +269,43 @@ function App() {
 
   }, [protons, neutrons, electrons, arrows, selectedIds, saveSnapshot])
 
-  const handleProtonPositionChange = useCallback((id, newPosition) => {
+  // Unified position change handler - routes to batch move for all particle types
+  const handlePositionChange = useCallback((id, newPosition) => {
     handleBatchMove(id, newPosition)
   }, [handleBatchMove])
 
-  const handleNeutronPositionChange = useCallback((id, newPosition) => {
-    handleBatchMove(id, newPosition)
-  }, [handleBatchMove])
-
-  const handleElectronPositionChange = useCallback((id, newPosition) => {
-    handleBatchMove(id, newPosition)
-  }, [handleBatchMove])
-
-  const handleArrowPositionChange = useCallback((id, newPosition) => {
-    handleBatchMove(id, newPosition)
-  }, [handleBatchMove])
-
-  const handleProtonRotationChange = useCallback((id, newRotation) => {
-    setProtons(prev => prev.map(p =>
-      p.id === id ? { ...p, rotation: newRotation } : p
-    ))
+  // Helper to get the correct setter based on particle type
+  const getSetterByType = useCallback((type) => {
+    const setters = {
+      proton: setProtons,
+      neutron: setNeutrons,
+      electron: setElectrons,
+      arrow: setArrows
+    }
+    return setters[type]
   }, [])
 
-  const handleNeutronRotationChange = useCallback((id, newRotation) => {
-    setNeutrons(prev => prev.map(n =>
-      n.id === id ? { ...n, rotation: newRotation } : n
-    ))
-  }, [])
+  // Unified rotation change handler
+  const handleRotationChange = useCallback((id, newRotation) => {
+    const type = id.split('-')[0]
+    const setter = getSetterByType(type)
+    if (setter) {
+      setter(prev => prev.map(p =>
+        p.id === id ? { ...p, rotation: newRotation } : p
+      ))
+    }
+  }, [getSetterByType])
 
-  const handleElectronRotationChange = useCallback((id, newRotation) => {
-    setElectrons(prev => prev.map(e =>
-      e.id === id ? { ...e, rotation: newRotation } : e
-    ))
-  }, [])
-
-  const handleArrowRotationChange = useCallback((id, newRotation) => {
-    setArrows(prev => prev.map(a =>
-      a.id === id ? { ...a, rotation: newRotation } : a
-    ))
-  }, [])
-
-  const handleProtonScaleChange = useCallback((id, newScale) => {
-    setProtons(prev => prev.map(p =>
-      p.id === id ? { ...p, scale: newScale } : p
-    ))
-  }, [])
-
-  const handleNeutronScaleChange = useCallback((id, newScale) => {
-    setNeutrons(prev => prev.map(n =>
-      n.id === id ? { ...n, scale: newScale } : n
-    ))
-  }, [])
-
-  const handleElectronScaleChange = useCallback((id, newScale) => {
-    setElectrons(prev => prev.map(e =>
-      e.id === id ? { ...e, scale: newScale } : e
-    ))
-  }, [])
-
-  const handleArrowScaleChange = useCallback((id, newScale) => {
-    setArrows(prev => prev.map(a =>
-      a.id === id ? { ...a, scale: newScale } : a
-    ))
-  }, [])
+  // Unified scale change handler
+  const handleScaleChange = useCallback((id, newScale) => {
+    const type = id.split('-')[0]
+    const setter = getSetterByType(type)
+    if (setter) {
+      setter(prev => prev.map(p =>
+        p.id === id ? { ...p, scale: newScale } : p
+      ))
+    }
+  }, [getSetterByType])
 
   const handleSelectParticle = useCallback((id, isMultiSelect) => {
     setSelectedIds(prev => {
@@ -512,22 +486,13 @@ function App() {
         protons={protons}
         neutrons={neutrons}
         electrons={electrons}
+        arrows={arrows}
         selectedIds={selectedIds}
         onSelectParticle={handleSelectParticle}
         onDeselectAll={handleDeselectAll}
-        onProtonPositionChange={handleProtonPositionChange}
-        onNeutronPositionChange={handleNeutronPositionChange}
-        onElectronPositionChange={handleElectronPositionChange}
-        onProtonRotationChange={handleProtonRotationChange}
-        onNeutronRotationChange={handleNeutronRotationChange}
-        onElectronRotationChange={handleElectronRotationChange}
-        arrows={arrows} // [NEW] Pass arrows to AtomScene
-        onArrowPositionChange={handleArrowPositionChange}
-        onArrowRotationChange={handleArrowRotationChange}
-        onProtonScaleChange={handleProtonScaleChange}
-        onNeutronScaleChange={handleNeutronScaleChange}
-        onElectronScaleChange={handleElectronScaleChange}
-        onArrowScaleChange={handleArrowScaleChange}
+        onPositionChange={handlePositionChange}
+        onRotationChange={handleRotationChange}
+        onScaleChange={handleScaleChange}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       />

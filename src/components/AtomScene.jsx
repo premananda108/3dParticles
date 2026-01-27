@@ -9,24 +9,14 @@ import CurvedArrow from './CurvedArrow'
 export default function AtomScene({
     protons,
     neutrons,
-
     electrons,
     arrows,
     selectedIds,
     onSelectParticle,
     onDeselectAll,
-    onProtonPositionChange,
-    onNeutronPositionChange,
-    onElectronPositionChange,
-    onProtonRotationChange,
-    onNeutronRotationChange,
-    onElectronRotationChange,
-    onArrowPositionChange,
-    onArrowRotationChange,
-    onProtonScaleChange,
-    onNeutronScaleChange,
-    onElectronScaleChange,
-    onArrowScaleChange,
+    onPositionChange,
+    onRotationChange,
+    onScaleChange,
     onDragStart,
     onDragEnd
 }) {
@@ -78,23 +68,14 @@ export default function AtomScene({
                     protons={protons}
                     neutrons={neutrons}
                     electrons={electrons}
+                    arrows={arrows}
                     selectedIds={selectedIds}
                     activeParticle={activeParticle}
                     transformMode={transformMode}
                     onSelectParticle={handleSelect}
-                    onProtonPositionChange={onProtonPositionChange}
-                    onNeutronPositionChange={onNeutronPositionChange}
-                    onElectronPositionChange={onElectronPositionChange}
-                    onProtonRotationChange={onProtonRotationChange}
-                    onNeutronRotationChange={onNeutronRotationChange}
-                    onElectronRotationChange={onElectronRotationChange}
-                    arrows={arrows}
-                    onArrowPositionChange={onArrowPositionChange}
-                    onArrowRotationChange={onArrowRotationChange}
-                    onProtonScaleChange={onProtonScaleChange}
-                    onNeutronScaleChange={onNeutronScaleChange}
-                    onElectronScaleChange={onElectronScaleChange}
-                    onArrowScaleChange={onArrowScaleChange}
+                    onPositionChange={onPositionChange}
+                    onRotationChange={onRotationChange}
+                    onScaleChange={onScaleChange}
                     isDragging={isDragging}
                     onDragStart={onDragStart}
                     onDragEnd={onDragEnd}
@@ -114,18 +95,9 @@ function SceneContent({
     activeParticle,
     transformMode,
     onSelectParticle,
-    onProtonPositionChange,
-    onNeutronPositionChange,
-    onElectronPositionChange,
-    onProtonRotationChange,
-    onNeutronRotationChange,
-    onElectronRotationChange,
-    onArrowPositionChange,
-    onArrowRotationChange,
-    onProtonScaleChange,
-    onNeutronScaleChange,
-    onElectronScaleChange,
-    onArrowScaleChange,
+    onPositionChange,
+    onRotationChange,
+    onScaleChange,
     isDragging,
     onDragStart,
     onDragEnd,
@@ -160,27 +132,16 @@ function SceneContent({
     const handleTransform = (e) => {
         if (!e.target.object) return
 
-        const { position, rotation } = e.target.object
+        const { position, rotation, scale } = e.target.object
         const id = e.target.object.userData.id
 
-        const findAndCallUpdater = (particles, posUpdater, rotUpdater, scaleUpdater) => {
-            const p = particles.find(p => p.id === id)
-            if (p) {
-                if (transformMode === 'translate') {
-                    posUpdater(id, [position.x, position.y, position.z])
-                } else if (transformMode === 'rotate') {
-                    rotUpdater(id, [rotation.x, rotation.y, rotation.z])
-                } else if (transformMode === 'scale') {
-                    scaleUpdater(id, [e.target.object.scale.x, e.target.object.scale.y, e.target.object.scale.z])
-                }
-            }
+        if (transformMode === 'translate') {
+            onPositionChange(id, [position.x, position.y, position.z])
+        } else if (transformMode === 'rotate') {
+            onRotationChange(id, [rotation.x, rotation.y, rotation.z])
+        } else if (transformMode === 'scale') {
+            onScaleChange(id, [scale.x, scale.y, scale.z])
         }
-
-        findAndCallUpdater(protons, onProtonPositionChange, onProtonRotationChange, onProtonScaleChange)
-        findAndCallUpdater(neutrons, onNeutronPositionChange, onNeutronRotationChange, onNeutronScaleChange)
-
-        findAndCallUpdater(electrons, onElectronPositionChange, onElectronRotationChange, onElectronScaleChange)
-        findAndCallUpdater(arrows, onArrowPositionChange, onArrowRotationChange, onArrowScaleChange)
     }
 
     return (
@@ -213,17 +174,6 @@ function SceneContent({
                     electrons={electrons}
                     selectedIds={selectedIds}
                     onSelectParticle={onSelectParticle}
-                    onProtonPositionChange={onProtonPositionChange}
-                    onNeutronPositionChange={onNeutronPositionChange}
-                    onElectronPositionChange={onElectronPositionChange}
-                    onProtonRotationChange={onProtonRotationChange}
-                    onNeutronRotationChange={onNeutronRotationChange}
-                    onElectronRotationChange={onElectronRotationChange}
-                    onProtonScaleChange={onProtonScaleChange}
-                    onNeutronScaleChange={onNeutronScaleChange}
-                    onElectronScaleChange={onElectronScaleChange}
-                    onDragStart={onDragStart}
-                    onDragEnd={onDragEnd}
                 />
 
                 {/* Arrows */}
@@ -235,13 +185,8 @@ function SceneContent({
                         position={arrow.position}
                         rotation={arrow.rotation}
                         scale={arrow.scale}
-                        onPositionChange={onArrowPositionChange}
-                        onRotationChange={onArrowRotationChange}
-                        onScaleChange={onArrowScaleChange}
                         isSelected={selectedIds?.has(arrow.id)}
                         onSelect={onSelectParticle}
-                        onDragStart={onDragStart}
-                        onDragEnd={onDragEnd}
                     >
                         <CurvedArrow />
                     </DraggableParticle>

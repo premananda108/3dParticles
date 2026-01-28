@@ -153,14 +153,6 @@ function SceneContent({
     // Convert degrees to radians for rotation snap
     const rotationSnap = rotateStep ? (rotateStep * Math.PI) / 180 : null
 
-    useEffect(() => {
-        if (transformRef.current) {
-            transformRef.current.rotationSnap = rotationSnap
-            console.log('AtomScene: Manually set rotationSnap to', rotationSnap)
-            console.log('AtomScene: transformRef.current.rotationSnap is now', transformRef.current.rotationSnap)
-        }
-    }, [rotationSnap, transformRef.current])
-
     return (
         <group ref={sceneRef}>
             {/* Background stars */}

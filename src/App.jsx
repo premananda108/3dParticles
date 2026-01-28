@@ -444,6 +444,9 @@ function App() {
     setSelectedIds(new Set())
   }, [saveSnapshot])
 
+  // Snap/Step state
+  const [moveStep, setMoveStep] = useState(0)
+
   // Set specific element configuration
   const handleSetElement = useCallback((protonCount, neutronCount, electronCount = 0) => {
     saveSnapshot()
@@ -488,6 +491,7 @@ function App() {
         electrons={electrons}
         arrows={arrows}
         selectedIds={selectedIds}
+        moveStep={moveStep}
         onSelectParticle={handleSelectParticle}
         onDeselectAll={handleDeselectAll}
         onPositionChange={handlePositionChange}
@@ -500,6 +504,8 @@ function App() {
         protonCount={protons.length}
         neutronCount={neutrons.length}
         selectedCount={selectedIds.size}
+        moveStep={moveStep}
+        onMoveStepChange={setMoveStep}
         onProtonChange={handleProtonCountChange}
         onNeutronChange={handleNeutronCountChange}
         onAddParticleStart={handleAddParticleStart}

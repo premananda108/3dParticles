@@ -14,7 +14,9 @@ export default function ControlPanel({
     onSetElement,
     onReset,
     onDeleteSelected,
-    onAddParticleStart
+    onAddParticleStart,
+    moveStep,
+    onMoveStepChange
 }) {
     const handleElementSelect = (element) => {
         if (onSetElement) {
@@ -84,6 +86,20 @@ export default function ControlPanel({
                     >
                         <div className="tool-icon arrow-icon">↗️</div>
                         <span>Добавить Стрелку</span>
+                    </div>
+                </div>
+
+                <div className="settings-section">
+                    <div className="setting-item">
+                        <label>📏 Шаг (0=выкл):</label>
+                        <input
+                            type="number"
+                            min="0"
+                            step="0.5"
+                            value={moveStep}
+                            onChange={(e) => onMoveStepChange(Number(e.target.value))}
+                            className="step-input"
+                        />
                     </div>
                 </div>
 

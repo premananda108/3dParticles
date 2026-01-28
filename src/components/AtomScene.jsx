@@ -12,6 +12,7 @@ export default function AtomScene({
     electrons,
     arrows,
     selectedIds,
+    moveStep,
     onSelectParticle,
     onDeselectAll,
     onPositionChange,
@@ -72,6 +73,7 @@ export default function AtomScene({
                     selectedIds={selectedIds}
                     activeParticle={activeParticle}
                     transformMode={transformMode}
+                    moveStep={moveStep}
                     onSelectParticle={handleSelect}
                     onPositionChange={onPositionChange}
                     onRotationChange={onRotationChange}
@@ -94,6 +96,7 @@ function SceneContent({
     selectedIds,
     activeParticle,
     transformMode,
+    moveStep,
     onSelectParticle,
     onPositionChange,
     onRotationChange,
@@ -197,6 +200,7 @@ function SceneContent({
                         ref={transformRef}
                         object={selectedObject}
                         mode={transformMode}
+                        translationSnap={moveStep > 0 ? moveStep : null}
                         onObjectChange={handleTransform}
                         onDraggingChanged={(e) => {
                             console.log('TransformControls dragging changed:', e.value, 'activeParticle:', activeParticleRef.current)

@@ -13,6 +13,7 @@ export default function AtomScene({
     arrows,
     selectedIds,
     moveStep,
+    rotateStep,
     onSelectParticle,
     onDeselectAll,
     onPositionChange,
@@ -74,6 +75,7 @@ export default function AtomScene({
                     activeParticle={activeParticle}
                     transformMode={transformMode}
                     moveStep={moveStep}
+                    rotateStep={rotateStep}
                     onSelectParticle={handleSelect}
                     onPositionChange={onPositionChange}
                     onRotationChange={onRotationChange}
@@ -97,6 +99,7 @@ function SceneContent({
     activeParticle,
     transformMode,
     moveStep,
+    rotateStep,
     onSelectParticle,
     onPositionChange,
     onRotationChange,
@@ -146,6 +149,17 @@ function SceneContent({
             onScaleChange(id, [scale.x, scale.y, scale.z])
         }
     }
+
+    // Convert degrees to radians for rotation snap
+    const rotationSnap = rotateStep ? (rotateStep * Math.PI) / 180 : null
+
+    useEffect(() => {
+        if (transformRef.current) {
+            transformRef.current.rotationSnap = rotationSnap
+            console.log('AtomScene: Manually set rotationSnap to', rotationSnap)
+            console.log('AtomScene: transformRef.current.rotationSnap is now', transformRef.current.rotationSnap)
+        }
+    }, [rotationSnap, transformRef.current])
 
     return (
         <group ref={sceneRef}>
@@ -201,6 +215,7 @@ function SceneContent({
                         object={selectedObject}
                         mode={transformMode}
                         translationSnap={moveStep > 0 ? moveStep : null}
+                        rotationSnap={rotationSnap}
                         onObjectChange={handleTransform}
                         onDraggingChanged={(e) => {
                             console.log('TransformControls dragging changed:', e.value, 'activeParticle:', activeParticleRef.current)

@@ -446,6 +446,7 @@ function App() {
 
   // Snap/Step state
   const [moveStep, setMoveStep] = useState(0)
+  const [rotateStep, setRotateStep] = useState(0)
 
   // Set specific element configuration
   const handleSetElement = useCallback((protonCount, neutronCount, electronCount = 0) => {
@@ -492,6 +493,7 @@ function App() {
         arrows={arrows}
         selectedIds={selectedIds}
         moveStep={moveStep}
+        rotateStep={rotateStep}
         onSelectParticle={handleSelectParticle}
         onDeselectAll={handleDeselectAll}
         onPositionChange={handlePositionChange}
@@ -506,6 +508,8 @@ function App() {
         selectedCount={selectedIds.size}
         moveStep={moveStep}
         onMoveStepChange={setMoveStep}
+        rotateStep={rotateStep}
+        onRotateStepChange={setRotateStep}
         onProtonChange={handleProtonCountChange}
         onNeutronChange={handleNeutronCountChange}
         onAddParticleStart={handleAddParticleStart}

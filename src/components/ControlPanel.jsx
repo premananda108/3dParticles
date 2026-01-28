@@ -16,7 +16,9 @@ export default function ControlPanel({
     onDeleteSelected,
     onAddParticleStart,
     moveStep,
-    onMoveStepChange
+    onMoveStepChange,
+    rotateStep,
+    onRotateStepChange
 }) {
     const handleElementSelect = (element) => {
         if (onSetElement) {
@@ -98,6 +100,17 @@ export default function ControlPanel({
                             step="0.5"
                             value={moveStep}
                             onChange={(e) => onMoveStepChange(Number(e.target.value))}
+                            className="step-input"
+                        />
+                    </div>
+                    <div className="setting-item">
+                        <label>🔄 Угол (градусы):</label>
+                        <input
+                            type="number"
+                            min="0"
+                            step="15"
+                            value={rotateStep}
+                            onChange={(e) => onRotateStepChange(Number(e.target.value))}
                             className="step-input"
                         />
                     </div>

@@ -23,7 +23,7 @@ export default function DraggableParticle({
             return;
         }
         e.stopPropagation();
-        const isMulti = e.metaKey || e.ctrlKey;
+        const isMulti = e.metaKey || e.ctrlKey || e.shiftKey;
         if (onSelect) {
             onSelect(id, isMulti);
         }

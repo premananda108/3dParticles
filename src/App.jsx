@@ -97,7 +97,7 @@ function App() {
     setElectrons(prev.electrons)
     setArrows(prev.arrows || [])
     setSelectedIds(new Set())
-  }, [protons, neutrons, electrons, arrows])
+  }, [protons, neutrons, electrons])
 
   // Redo last undone action
   const redo = useCallback(() => {
@@ -118,7 +118,7 @@ function App() {
     setElectrons(next.electrons)
     setArrows(next.arrows || [])
     setSelectedIds(new Set())
-  }, [protons, neutrons, electrons, arrows])
+  }, [protons, neutrons, electrons])
 
   const handleProtonCountChange = useCallback((newCount) => {
     saveSnapshot()
@@ -431,6 +431,13 @@ function App() {
 
   const handleSelectParticle = useCallback((id, isMultiSelect) => {
     setSelectedIds(prev => {
+      // If we are clicking a particle that's already part of the selection
+      // and NOT using a multi-select modifier (Shift/Ctrl), we keep the selection as is.
+      // This allows AtomScene to toggle the transform mode without deselecting other group members.
+      if (!isMultiSelect && prev.has(id)) {
+        return prev
+      }
+
       const newSelected = new Set(isMultiSelect ? prev : [])
       if (newSelected.has(id)) {
         newSelected.delete(id)

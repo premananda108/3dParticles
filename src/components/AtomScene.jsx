@@ -26,6 +26,26 @@ export default function AtomScene({
     const [activeParticle, setActiveParticle] = useState(null)
     const [transformMode, setTransformMode] = useState('translate')
 
+    // Sync activeParticle with selectedIds
+    const [prevSelectedIds, setPrevSelectedIds] = useState(selectedIds)
+    if (selectedIds !== prevSelectedIds) {
+        setPrevSelectedIds(selectedIds)
+        if (!selectedIds || selectedIds.size === 0) {
+            if (activeParticle !== null) setActiveParticle(null)
+        } else if (selectedIds.size === 1) {
+            const firstId = Array.from(selectedIds)[0]
+            if (activeParticle !== firstId) {
+                setActiveParticle(firstId)
+            }
+        } else {
+            // If we have a multi-selection and the current active particle
+            // is no longer part of that selection, we pick another one as active.
+            if (activeParticle && !selectedIds.has(activeParticle)) {
+                setActiveParticle(Array.from(selectedIds)[0])
+            }
+        }
+    }
+
     const handleSelect = (particleId, isMultiSelect) => {
         if (activeParticle === particleId && !isMultiSelect) {
             setTransformMode(prev => {
@@ -44,16 +64,6 @@ export default function AtomScene({
         setActiveParticle(null)
         onDeselectAll()
     }
-
-    // Auto-activate gizmo when exactly one particle is selected (e.g., when added)
-    useEffect(() => {
-        if (selectedIds && selectedIds.size === 1) {
-            const firstId = Array.from(selectedIds)[0]
-            if (activeParticle !== firstId) {
-                setActiveParticle(firstId)
-            }
-        }
-    }, [selectedIds, activeParticle])
 
     return (
         <div className="scene-container">
@@ -117,7 +127,6 @@ function SceneContent({
     const [selectedObject, setSelectedObject] = useState(null)
 
     useEffect(() => {
-        console.log('SceneContent: arrows prop', arrows)
         activeParticleRef.current = activeParticle
         if (activeParticle && sceneRef.current) {
             const object = sceneRef.current.getObjectByName(activeParticle)

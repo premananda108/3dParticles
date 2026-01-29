@@ -197,7 +197,7 @@ function SceneContent({
                         isSelected={selectedIds?.has(arrow.id)}
                         onSelect={onSelectParticle}
                     >
-                        <CurvedArrow />
+                        <CurvedArrow color={arrow.color} />
                     </DraggableParticle>
                 ))}
 

@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import * as THREE from 'three'
 
-export default function Electron() {
+export default function Electron({ color = "#0088ff" }) {
     const meshRef = useRef()
 
     return (
@@ -20,7 +20,7 @@ export default function Electron() {
             */}
             <torusGeometry args={[0.8, 0.75, 32, 64]} />
             <meshPhysicalMaterial
-                color="#0088ff" // Much stronger blue
+                color={color} // Customizeable color
                 emissive="#0044aa" // Deep blue emission
                 emissiveIntensity={0.5} // Higher emission for glowing effect
                 transparent={true}

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
 
-export default function CurvedArrow() {
+export default function CurvedArrow({ color = "#00ccff" }) {
     const { tubeGeometry, coneGeometry } = useMemo(() => {
         // Create a straight arrow
         const curve = new THREE.LineCurve3(
@@ -23,14 +23,14 @@ export default function CurvedArrow() {
         <group>
             <mesh geometry={tubeGeometry}>
                 <meshStandardMaterial
-                    color="#00ccff"
+                    color={color}
                     roughness={0.3}
                     metalness={0.2}
                 />
             </mesh>
             <mesh geometry={coneGeometry}>
                 <meshStandardMaterial
-                    color="#00ccff"
+                    color={color}
                     roughness={0.3}
                     metalness={0.2}
                 />

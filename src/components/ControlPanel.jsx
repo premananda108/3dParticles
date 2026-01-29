@@ -13,12 +13,14 @@ export default function ControlPanel({
     onNeutronChange,
     onSetElement,
     onReset,
-    onDeleteSelected,
     onAddParticleStart,
     moveStep,
+    onDeleteSelected,
     onMoveStepChange,
     rotateStep,
-    onRotateStepChange
+    onRotateStepChange,
+    selectedColor,
+    onColorChange
 }) {
     const handleElementSelect = (element) => {
         if (onSetElement) {
@@ -112,6 +114,17 @@ export default function ControlPanel({
                             value={rotateStep}
                             onChange={(e) => onRotateStepChange(Number(e.target.value))}
                             className="step-input"
+                        />
+                    </div>
+                    <div className="setting-item">
+                        <label>🎨 Цвет:</label>
+                        <input
+                            type="color"
+                            value={selectedColor || '#ffffff'}
+                            onChange={(e) => onColorChange(e.target.value)}
+                            disabled={selectedCount === 0}
+                            className="color-input"
+                            title={selectedCount > 0 ? "Изменить цвет выбранного" : "Выберите элемент"}
                         />
                     </div>
                 </div>

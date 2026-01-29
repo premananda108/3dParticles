@@ -44,7 +44,7 @@ function generateClusterPositions(count, existingPositions = []) {
 
 function App() {
   const [protons, setProtons] = useState([
-    { id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0] }
+    { id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0], color: '#ff3333' }
   ])
   const [neutrons, setNeutrons] = useState([])
   const [electrons, setElectrons] = useState([])
@@ -150,14 +150,17 @@ function App() {
     }
 
     if (type === 'proton') {
+      newParticle.color = '#ff3333'
       setProtons(prev => [...prev, newParticle])
     } else if (type === 'neutron') {
+      newParticle.color = '#bbbbbb'
       setNeutrons(prev => [...prev, newParticle])
     } else if (type === 'electron') {
-
+      newParticle.color = '#0088ff'
       setElectrons(prev => [...prev, newParticle])
     } else if (type === 'arrow') {
       console.log('App: Adding arrow')
+      newParticle.color = '#00ccff'
       setArrows(prev => [...prev, newParticle])
     }
 
@@ -307,6 +310,33 @@ function App() {
     }
   }, [getSetterByType])
 
+  // Unified color change handler
+  const handleColorChange = useCallback((newColor) => {
+    saveSnapshot()
+
+    // Helper to update color for selected particles in a list
+    const updateColor = (list) => list.map(p =>
+      selectedIds.has(p.id) ? { ...p, color: newColor } : p
+    )
+
+    setProtons(prev => updateColor(prev))
+    setNeutrons(prev => updateColor(prev))
+    setElectrons(prev => updateColor(prev))
+    setArrows(prev => updateColor(prev))
+  }, [selectedIds, saveSnapshot])
+
+  // Determine current selected color (take the first selected item's color)
+  const getSelectedColor = useCallback(() => {
+    if (selectedIds.size === 0) return '#ffffff'
+
+    const firstId = Array.from(selectedIds)[0]
+    const allParticles = [...protons, ...neutrons, ...electrons, ...arrows]
+    const found = allParticles.find(p => p.id === firstId)
+    return found ? (found.color || '#ffffff') : '#ffffff'
+  }, [selectedIds, protons, neutrons, electrons, arrows])
+
+  const selectedColor = getSelectedColor()
+
   const handleSelectParticle = useCallback((id, isMultiSelect) => {
     setSelectedIds(prev => {
       const newSelected = new Set(isMultiSelect ? prev : [])
@@ -354,7 +384,8 @@ function App() {
           particle.position[2]
         ],
         rotation: particle.rotation ? [...particle.rotation] : [0, 0, 0],
-        scale: particle.scale ? [...particle.scale] : [1, 1, 1]
+        scale: particle.scale ? [...particle.scale] : [1, 1, 1],
+        color: particle.color
       }
     }
 
@@ -436,7 +467,7 @@ function App() {
 
   const handleReset = useCallback(() => {
     saveSnapshot()
-    setProtons([{ id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0] }])
+    setProtons([{ id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0], color: '#ff3333' }])
     setNeutrons([])
 
     setElectrons([])
@@ -458,7 +489,8 @@ function App() {
       newProtons = [{
         id: `proton-${Date.now()}-center`,
         position: [0, 0, 0],
-        rotation: [0, 0, 0]
+        rotation: [0, 0, 0],
+        color: '#ff3333'
       }]
     } else {
       newProtons = generateClusterPositions(protonCount, [])
@@ -472,7 +504,8 @@ function App() {
       newElectrons = [{
         id: `electron-${Date.now()}-0`,
         position: [0, 0, 0],
-        rotation: [0, 0, 0]
+        rotation: [0, 0, 0],
+        color: '#0088ff'
       }]
     } else {
       newElectrons = generateClusterPositions(electronCount, [])
@@ -506,6 +539,8 @@ function App() {
         protonCount={protons.length}
         neutronCount={neutrons.length}
         selectedCount={selectedIds.size}
+        selectedColor={selectedColor}
+        onColorChange={handleColorChange}
         moveStep={moveStep}
         onMoveStepChange={setMoveStep}
         rotateStep={rotateStep}

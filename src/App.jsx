@@ -44,7 +44,7 @@ function generateClusterPositions(count, existingPositions = []) {
 
 function App() {
   const [protons, setProtons] = useState([
-    { id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0], color: '#ff3333' }
+    { id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0], color: '#ff3333', emissive: '#ff0000' }
   ])
   const [neutrons, setNeutrons] = useState([])
   const [electrons, setElectrons] = useState([])
@@ -151,16 +151,20 @@ function App() {
 
     if (type === 'proton') {
       newParticle.color = '#ff3333'
+      newParticle.emissive = '#ff0000'
       setProtons(prev => [...prev, newParticle])
     } else if (type === 'neutron') {
       newParticle.color = '#bbbbbb'
+      newParticle.emissive = '#444444'
       setNeutrons(prev => [...prev, newParticle])
     } else if (type === 'electron') {
       newParticle.color = '#0088ff'
+      newParticle.emissive = '#0044aa'
       setElectrons(prev => [...prev, newParticle])
     } else if (type === 'arrow') {
       console.log('App: Adding arrow')
       newParticle.color = '#00ccff'
+      newParticle.emissive = '#000000'
       setArrows(prev => [...prev, newParticle])
     }
 
@@ -310,13 +314,16 @@ function App() {
     }
   }, [getSetterByType])
 
-  // Unified color change handler
-  const handleColorChange = useCallback((newColor) => {
+  // Unified color change handler (supports 'base' or 'emissive')
+  const handleColorChange = useCallback((newColor, type = 'base') => {
     saveSnapshot()
 
     // Helper to update color for selected particles in a list
     const updateColor = (list) => list.map(p =>
-      selectedIds.has(p.id) ? { ...p, color: newColor } : p
+      selectedIds.has(p.id) ? {
+        ...p,
+        [type === 'base' ? 'color' : 'emissive']: newColor
+      } : p
     )
 
     setProtons(prev => updateColor(prev))
@@ -325,17 +332,20 @@ function App() {
     setArrows(prev => updateColor(prev))
   }, [selectedIds, saveSnapshot])
 
-  // Determine current selected color (take the first selected item's color)
-  const getSelectedColor = useCallback(() => {
-    if (selectedIds.size === 0) return '#ffffff'
+  // Determine current selected colors
+  const getSelectedColors = useCallback(() => {
+    if (selectedIds.size === 0) return { base: '#ffffff', emissive: '#000000' }
 
     const firstId = Array.from(selectedIds)[0]
     const allParticles = [...protons, ...neutrons, ...electrons, ...arrows]
     const found = allParticles.find(p => p.id === firstId)
-    return found ? (found.color || '#ffffff') : '#ffffff'
+    return {
+      base: found ? (found.color || '#ffffff') : '#ffffff',
+      emissive: found ? (found.emissive || '#000000') : '#000000'
+    }
   }, [selectedIds, protons, neutrons, electrons, arrows])
 
-  const selectedColor = getSelectedColor()
+  const { base: selectedColor, emissive: selectedEmissive } = getSelectedColors()
 
   const handleSelectParticle = useCallback((id, isMultiSelect) => {
     setSelectedIds(prev => {
@@ -385,7 +395,8 @@ function App() {
         ],
         rotation: particle.rotation ? [...particle.rotation] : [0, 0, 0],
         scale: particle.scale ? [...particle.scale] : [1, 1, 1],
-        color: particle.color
+        color: particle.color,
+        emissive: particle.emissive
       }
     }
 
@@ -467,7 +478,7 @@ function App() {
 
   const handleReset = useCallback(() => {
     saveSnapshot()
-    setProtons([{ id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0], color: '#ff3333' }])
+    setProtons([{ id: 'proton-0', position: [0, 0, 0], rotation: [0, 0, 0], color: '#ff3333', emissive: '#ff0000' }])
     setNeutrons([])
 
     setElectrons([])
@@ -490,7 +501,8 @@ function App() {
         id: `proton-${Date.now()}-center`,
         position: [0, 0, 0],
         rotation: [0, 0, 0],
-        color: '#ff3333'
+        color: '#ff3333',
+        emissive: '#ff0000'
       }]
     } else {
       newProtons = generateClusterPositions(protonCount, [])
@@ -505,7 +517,8 @@ function App() {
         id: `electron-${Date.now()}-0`,
         position: [0, 0, 0],
         rotation: [0, 0, 0],
-        color: '#0088ff'
+        color: '#0088ff',
+        emissive: '#0044aa'
       }]
     } else {
       newElectrons = generateClusterPositions(electronCount, [])
@@ -540,6 +553,7 @@ function App() {
         neutronCount={neutrons.length}
         selectedCount={selectedIds.size}
         selectedColor={selectedColor}
+        selectedEmissive={selectedEmissive}
         onColorChange={handleColorChange}
         moveStep={moveStep}
         onMoveStepChange={setMoveStep}

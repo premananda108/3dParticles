@@ -23,7 +23,7 @@ export default function Nucleus({
                     isSelected={selectedIds?.has(particle.id)}
                     onSelect={onSelectParticle}
                 >
-                    <Proton color={particle.color} />
+                    <Proton color={particle.color} emissive={particle.emissive} />
                 </DraggableParticle>
             ))}
             {neutrons.map((particle) => (
@@ -37,7 +37,7 @@ export default function Nucleus({
                     isSelected={selectedIds?.has(particle.id)}
                     onSelect={onSelectParticle}
                 >
-                    <Neutron color={particle.color} />
+                    <Neutron color={particle.color} emissive={particle.emissive} />
                 </DraggableParticle>
             ))}
             {electrons?.map((particle) => (
@@ -51,7 +51,7 @@ export default function Nucleus({
                     isSelected={selectedIds?.has(particle.id)}
                     onSelect={onSelectParticle}
                 >
-                    <Electron color={particle.color} />
+                    <Electron color={particle.color} emissive={particle.emissive} />
                 </DraggableParticle>
             ))}
         </group>

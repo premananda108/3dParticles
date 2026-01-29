@@ -20,6 +20,7 @@ export default function ControlPanel({
     rotateStep,
     onRotateStepChange,
     selectedColor,
+    selectedEmissive,
     onColorChange
 }) {
     const handleElementSelect = (element) => {
@@ -118,14 +119,24 @@ export default function ControlPanel({
                     </div>
                     <div className="setting-item">
                         <label>🎨 Цвет:</label>
-                        <input
-                            type="color"
-                            value={selectedColor || '#ffffff'}
-                            onChange={(e) => onColorChange(e.target.value)}
-                            disabled={selectedCount === 0}
-                            className="color-input"
-                            title={selectedCount > 0 ? "Изменить цвет выбранного" : "Выберите элемент"}
-                        />
+                        <div className="color-inputs">
+                            <input
+                                type="color"
+                                value={selectedColor || '#ffffff'}
+                                onChange={(e) => onColorChange(e.target.value, 'base')}
+                                disabled={selectedCount === 0}
+                                className="color-input"
+                                title="Основной цвет"
+                            />
+                            <input
+                                type="color"
+                                value={selectedEmissive || '#000000'}
+                                onChange={(e) => onColorChange(e.target.value, 'emissive')}
+                                disabled={selectedCount === 0}
+                                className="color-input"
+                                title="Цвет свечения (emissive)"
+                            />
+                        </div>
                     </div>
                 </div>
 

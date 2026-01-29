@@ -27,7 +27,7 @@ export default function DraggableParticle({
         if (onSelect) {
             onSelect(id, isMulti);
         }
-    }, [id, onSelect, isDragging]);
+    }, [id, onSelect, isDragging, gizmoHoveredRef]);
 
 
 
@@ -43,6 +43,7 @@ export default function DraggableParticle({
             name={name}
             userData={{ id }}
             position={position}
+            rotation={rotation}
             scale={scale}
             onPointerDown={handlePointerDown}
 
@@ -51,7 +52,6 @@ export default function DraggableParticle({
             <group
                 ref={innerRef}
                 scale={isSelected ? 1.15 : 1}
-                rotation={rotation}
             >
                 {children}
                 {isSelected && (

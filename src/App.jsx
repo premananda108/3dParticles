@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import * as THREE from 'three'
 import AtomScene from './components/AtomScene'
 import ControlPanel from './components/ControlPanel'
 import './App.css'
@@ -180,23 +181,27 @@ function App() {
 
     if (!leader) return
 
-    // 2. Snapshot positions of ALL selected particles
+    // 2. Snapshot positions and rotations of ALL selected particles
     const snapshot = {
       leaderId,
       initialLeaderPos: [...leader.position],
+      initialLeaderRot: [...(leader.rotation || [0, 0, 0])],
       particles: {}
     }
 
-    // Store initial positions for all selected particles
+    // Store initial states for all selected particles
     allParticles.forEach(p => {
       if (selectedIds.has(p.id)) {
-        snapshot.particles[p.id] = [...p.position]
+        snapshot.particles[p.id] = {
+          position: [...p.position],
+          rotation: [...(p.rotation || [0, 0, 0])]
+        }
       }
     })
 
     console.log('App: Created snapshot', snapshot)
     dragSnapshot.current = snapshot
-  }, [protons, neutrons, electrons, selectedIds])
+  }, [protons, neutrons, electrons, arrows, selectedIds])
 
   const handleDragEnd = useCallback(() => {
     console.log('App: handleDragEnd')
@@ -224,12 +229,16 @@ function App() {
       const snapshot = {
         leaderId,
         initialLeaderPos: [...leader.position],
+        initialLeaderRot: [...(leader.rotation || [0, 0, 0])],
         particles: {}
       }
 
       allParticles.forEach(p => {
         if (selectedIds.has(p.id)) {
-          snapshot.particles[p.id] = [...p.position]
+          snapshot.particles[p.id] = {
+            position: [...p.position],
+            rotation: [...(p.rotation || [0, 0, 0])]
+          }
         }
       })
 
@@ -255,13 +264,13 @@ function App() {
       }
       // Other selected particles get the delta applied
       if (particles[p.id]) {
-        const initialPos = particles[p.id]
+        const initial = particles[p.id]
         return {
           ...p,
           position: [
-            initialPos[0] + deltaX,
-            initialPos[1] + deltaY,
-            initialPos[2] + deltaZ
+            initial.position[0] + deltaX,
+            initial.position[1] + deltaY,
+            initial.position[2] + deltaZ
           ]
         }
       }
@@ -274,6 +283,85 @@ function App() {
     setElectrons(prev => updateArray(prev))
     setArrows(prev => updateArray(prev))
 
+  }, [protons, neutrons, electrons, arrows, selectedIds, saveSnapshot])
+
+  // Helper to update rotation for a group of selected particles
+  const handleBatchRotate = useCallback((leaderId, newRotation) => {
+    // Lazily create snapshot if it doesn't exist or is stale
+    if (!dragSnapshot.current ||
+      dragSnapshot.current.leaderId !== leaderId ||
+      Object.keys(dragSnapshot.current.particles).length !== selectedIds.size) {
+
+      const allParticles = [...protons, ...neutrons, ...electrons, ...arrows]
+      const leader = allParticles.find(p => p.id === leaderId)
+
+      if (!leader) return
+
+      saveSnapshot()
+
+      const snapshot = {
+        leaderId,
+        initialLeaderPos: [...leader.position],
+        initialLeaderRot: [...(leader.rotation || [0, 0, 0])],
+        particles: {}
+      }
+
+      allParticles.forEach(p => {
+        if (selectedIds.has(p.id)) {
+          snapshot.particles[p.id] = {
+            position: [...p.position],
+            rotation: [...(p.rotation || [0, 0, 0])]
+          }
+        }
+      })
+      dragSnapshot.current = snapshot
+    }
+
+    const { initialLeaderPos, initialLeaderRot, particles } = dragSnapshot.current
+
+    // Calculate delta rotation
+    const qInitial = new THREE.Quaternion().setFromEuler(new THREE.Euler(...initialLeaderRot))
+    const qNew = new THREE.Quaternion().setFromEuler(new THREE.Euler(...newRotation))
+    const qDelta = qNew.clone().multiply(qInitial.clone().invert())
+
+    const updateArray = (arr) => arr.map(p => {
+      // Leader gets the exact new rotation
+      if (p.id === leaderId) {
+        return {
+          ...p,
+          rotation: [...newRotation]
+        }
+      }
+
+      // Other selected particles get rotated around the leader
+      if (particles[p.id]) {
+        const initial = particles[p.id]
+
+        // 1. Calculate new position: rotate relative vector around pivot
+        const pivot = new THREE.Vector3(...initialLeaderPos)
+        const posInitial = new THREE.Vector3(...initial.position)
+        const vRelative = posInitial.clone().sub(pivot)
+        const vRotated = vRelative.applyQuaternion(qDelta)
+        const posNew = pivot.clone().add(vRotated)
+
+        // 2. Calculate new rotation: apply delta to initial rotation
+        const qParticleInitial = new THREE.Quaternion().setFromEuler(new THREE.Euler(...initial.rotation))
+        const qParticleNew = qDelta.clone().multiply(qParticleInitial)
+        const eParticleNew = new THREE.Euler().setFromQuaternion(qParticleNew)
+
+        return {
+          ...p,
+          position: [posNew.x, posNew.y, posNew.z],
+          rotation: [eParticleNew.x, eParticleNew.y, eParticleNew.z]
+        }
+      }
+      return p
+    })
+
+    setProtons(prev => updateArray(prev))
+    setNeutrons(prev => updateArray(prev))
+    setElectrons(prev => updateArray(prev))
+    setArrows(prev => updateArray(prev))
   }, [protons, neutrons, electrons, arrows, selectedIds, saveSnapshot])
 
   // Unified position change handler - routes to batch move for all particle types
@@ -294,14 +382,8 @@ function App() {
 
   // Unified rotation change handler
   const handleRotationChange = useCallback((id, newRotation) => {
-    const type = id.split('-')[0]
-    const setter = getSetterByType(type)
-    if (setter) {
-      setter(prev => prev.map(p =>
-        p.id === id ? { ...p, rotation: newRotation } : p
-      ))
-    }
-  }, [getSetterByType])
+    handleBatchRotate(id, newRotation)
+  }, [handleBatchRotate])
 
   // Unified scale change handler
   const handleScaleChange = useCallback((id, newScale) => {

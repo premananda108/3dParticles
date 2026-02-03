@@ -576,8 +576,8 @@ function App() {
   }, [saveSnapshot])
 
   // Snap/Step state
-  const [moveStep, setMoveStep] = useState(0)
-  const [rotateStep, setRotateStep] = useState(0)
+  const [moveStep, setMoveStep] = useState(0.5)
+  const [rotateStep, setRotateStep] = useState(45)
 
   // Set specific element configuration
   const handleSetElement = useCallback((protonCount, neutronCount, electronCount = 0) => {

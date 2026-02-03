@@ -452,6 +452,16 @@ function App() {
     setSelectedIds(new Set())
   }, [])
 
+  const handleSelectAll = useCallback(() => {
+    const allIds = new Set([
+      ...protons.map(p => p.id),
+      ...neutrons.map(p => p.id),
+      ...electrons.map(p => p.id),
+      ...arrows.map(p => p.id)
+    ])
+    setSelectedIds(allIds)
+  }, [protons, neutrons, electrons, arrows])
+
   const handleDeleteSelected = useCallback(() => {
     if (selectedIds.size === 0) return
     saveSnapshot()
@@ -539,6 +549,12 @@ function App() {
         redo()
         return
       }
+      // Select All: Cmd+A or Ctrl+A
+      if ((e.metaKey || e.ctrlKey) && e.key === 'a') {
+        e.preventDefault()
+        handleSelectAll()
+        return
+      }
       // Duplicate: Cmd+D or Ctrl+D
       if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
         e.preventDefault()
@@ -556,7 +572,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleDeleteSelected, handleDuplicateSelected, undo, redo])
+  }, [handleDeleteSelected, handleDuplicateSelected, handleSelectAll, undo, redo])
 
   // Global listener to disable context menu
   useEffect(() => {

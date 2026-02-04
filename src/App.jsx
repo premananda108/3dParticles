@@ -635,6 +635,53 @@ function App() {
     setArrows([]) // Reset arrows on element set
   }, [saveSnapshot])
 
+  // Save scene to JSON file
+  const handleSave = useCallback(() => {
+    const data = {
+      protons,
+      neutrons,
+      electrons,
+      arrows
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'atom-scene.json'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }, [protons, neutrons, electrons, arrows])
+
+  // Load scene from JSON file
+  const handleLoad = useCallback((file) => {
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const content = e.target.result
+        const data = JSON.parse(content)
+
+        if (data.protons && Array.isArray(data.protons)) {
+          saveSnapshot() // Save state before loading
+          setProtons(data.protons)
+          setNeutrons(data.neutrons || [])
+          setElectrons(data.electrons || [])
+          setArrows(data.arrows || [])
+          setSelectedIds(new Set())
+        } else {
+          alert('Ошибка: Неверный формат файла')
+        }
+      } catch (error) {
+        console.error('Error loading file:', error)
+        alert('Ошибка при чтении файла')
+      }
+    }
+    reader.readAsText(file)
+  }, [saveSnapshot])
+
   return (
     <div className="app">
       <AtomScene
@@ -670,6 +717,8 @@ function App() {
         onSetElement={handleSetElement}
         onDeleteSelected={handleDeleteSelected}
         onReset={handleReset}
+        onSave={handleSave}
+        onLoad={handleLoad}
       />
     </div>
   )

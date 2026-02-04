@@ -1,9 +1,10 @@
 import './ControlPanel.css'
 
-// Predefined elements with their proton and neutron counts
 const ELEMENTS = [
     { symbol: 'H', name: 'Водород', protons: 1, neutrons: 0, electrons: 1 },
 ]
+
+import { useRef } from 'react'
 
 export default function ControlPanel({
     protonCount,
@@ -21,8 +22,20 @@ export default function ControlPanel({
     onRotateStepChange,
     selectedColor,
     selectedEmissive,
-    onColorChange
+    onColorChange,
+    onSave,
+    onLoad
 }) {
+    const fileInputRef = useRef(null)
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0]
+        if (file) {
+            onLoad(file)
+        }
+        // Reset input so same file can be selected again
+        e.target.value = ''
+    }
     const handleElementSelect = (element) => {
         if (onSetElement) {
             // Pass protons, neutrons, AND electrons
@@ -151,6 +164,29 @@ export default function ControlPanel({
                     <button className="reset-btn" onClick={onReset}>
                         🔄 Сбросить
                     </button>
+                </div>
+
+                <div className="storage-section">
+                    <h3>Файл</h3>
+                    <div className="storage-buttons">
+                        <button className="storage-btn save-btn" onClick={onSave} title="Сохранить в файл">
+                            💾 Сохранить
+                        </button>
+                        <button
+                            className="storage-btn load-btn"
+                            onClick={() => fileInputRef.current?.click()}
+                            title="Загрузить из файла"
+                        >
+                            📂 Загрузить
+                        </button>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept=".json"
+                            style={{ display: 'none' }}
+                        />
+                    </div>
                 </div>
             </div>
 

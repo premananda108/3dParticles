@@ -430,6 +430,9 @@ function App() {
   const { base: selectedColor, emissive: selectedEmissive } = getSelectedColors()
 
   const handleSelectParticle = useCallback((id, isMultiSelect) => {
+    // Reset drag snapshot on any select action to prevent stale positions
+    dragSnapshot.current = null
+
     setSelectedIds(prev => {
       // If we are clicking a particle that's already part of the selection
       // and NOT using a multi-select modifier (Shift/Ctrl), we keep the selection as is.

@@ -126,6 +126,21 @@ function SceneContent({
     const activeParticleRef = useRef(activeParticle)
     const [selectedObject, setSelectedObject] = useState(null)
 
+    // Refs for latest callbacks to avoid stale closures in event listeners
+    const onDragStartRef = useRef(onDragStart)
+    const onDragEndRef = useRef(onDragEnd)
+    const onPositionChangeRef = useRef(onPositionChange)
+    const onRotationChangeRef = useRef(onRotationChange)
+    const onScaleChangeRef = useRef(onScaleChange)
+
+    useEffect(() => {
+        onDragStartRef.current = onDragStart
+        onDragEndRef.current = onDragEnd
+        onPositionChangeRef.current = onPositionChange
+        onRotationChangeRef.current = onRotationChange
+        onScaleChangeRef.current = onScaleChange
+    }, [onDragStart, onDragEnd, onPositionChange, onRotationChange, onScaleChange])
+
     useEffect(() => {
         activeParticleRef.current = activeParticle
         if (activeParticle && sceneRef.current) {
@@ -151,11 +166,11 @@ function SceneContent({
         const id = e.target.object.userData.id
 
         if (transformMode === 'translate') {
-            onPositionChange(id, [position.x, position.y, position.z])
+            onPositionChangeRef.current(id, [position.x, position.y, position.z])
         } else if (transformMode === 'rotate') {
-            onRotationChange(id, [rotation.x, rotation.y, rotation.z])
+            onRotationChangeRef.current(id, [rotation.x, rotation.y, rotation.z])
         } else if (transformMode === 'scale') {
-            onScaleChange(id, [scale.x, scale.y, scale.z])
+            onScaleChangeRef.current(id, [scale.x, scale.y, scale.z])
         }
     }
 
@@ -219,12 +234,11 @@ function SceneContent({
                         rotationSnap={rotationSnap}
                         onObjectChange={handleTransform}
                         onDraggingChanged={(e) => {
-                            console.log('TransformControls dragging changed:', e.value, 'activeParticle:', activeParticleRef.current)
                             setIsDragging(e.value)
                             if (e.value) {
-                                onDragStart(activeParticleRef.current)
+                                onDragStartRef.current(activeParticleRef.current)
                             } else {
-                                onDragEnd()
+                                onDragEndRef.current()
                             }
                         }}
                     />

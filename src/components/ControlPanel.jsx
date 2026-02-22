@@ -1,7 +1,7 @@
 import './ControlPanel.css'
 
 const ELEMENTS = [
-    { symbol: 'H', name: 'Водород', protons: 1, neutrons: 0, electrons: 1 },
+    { symbol: 'H', name: 'Hydrogen', protons: 1, neutrons: 0, electrons: 1 },
 ]
 
 import { useRef } from 'react'
@@ -50,66 +50,66 @@ export default function ControlPanel({
 
     return (
         <div className="control-panel">
-            <h1 className="title">⚛️ Моделирование атома</h1>
+            <h1 className="title">⚛️ Atom Modeling</h1>
 
             <div className="info-display">
                 <div className="info-item">
-                    <span className="info-label">Протоны (Z)</span>
+                    <span className="info-label">Protons (Z)</span>
                     <span className="info-value proton-value">{protonCount}</span>
                 </div>
                 <div className="info-item">
-                    <span className="info-label">Нейтроны (N)</span>
+                    <span className="info-label">Neutrons (N)</span>
                     <span className="info-value neutron-value">{neutronCount}</span>
                 </div>
                 <div className="info-item">
-                    <span className="info-label">Массовое число (A)</span>
+                    <span className="info-label">Mass Number (A)</span>
                     <span className="info-value">{massNumber}</span>
                 </div>
             </div>
 
             <div className="controls-section">
-                <h2>Управление частицами</h2>
+                <h2>Particle Management</h2>
 
                 <div className="particle-tool-group">
                     <div
                         className="particle-tool proton-tool"
                         onClick={() => onAddParticleStart('proton')}
-                        title="Кликните, чтобы добавить протон"
+                        title="Click to add a proton"
                     >
                         <div className="tool-icon proton-icon"></div>
-                        <span>Добавить Протон</span>
+                        <span>Add Proton</span>
                     </div>
 
                     <div
                         className="particle-tool neutron-tool"
                         onClick={() => onAddParticleStart('neutron')}
-                        title="Кликните, чтобы добавить нейтрон"
+                        title="Click to add a neutron"
                     >
                         <div className="tool-icon neutron-icon"></div>
-                        <span>Добавить Нейтрон</span>
+                        <span>Add Neutron</span>
                     </div>
 
                     <div
                         className="particle-tool electron-tool"
                         onClick={() => onAddParticleStart('electron')}
-                        title="Кликните, чтобы добавить электрон"
+                        title="Click to add an electron"
                     >
                         <div className="tool-icon electron-icon"></div>
-                        <span>Добавить Электрон</span>
+                        <span>Add Electron</span>
                     </div>
                     <div
                         className="particle-tool arrow-tool"
                         onClick={() => onAddParticleStart('arrow')}
-                        title="Кликните, чтобы добавить стрелку"
+                        title="Click to add an arrow"
                     >
                         <div className="tool-icon arrow-icon">↗️</div>
-                        <span>Добавить Стрелку</span>
+                        <span>Add Arrow</span>
                     </div>
                 </div>
 
                 <div className="settings-section">
                     <div className="setting-item">
-                        <label>📏 Шаг (0=выкл):</label>
+                        <label>📏 Step (0=off):</label>
                         <input
                             type="number"
                             min="0"
@@ -120,7 +120,7 @@ export default function ControlPanel({
                         />
                     </div>
                     <div className="setting-item">
-                        <label>🔄 Угол (градусы):</label>
+                        <label>🔄 Angle (deg):</label>
                         <input
                             type="number"
                             min="0"
@@ -131,7 +131,7 @@ export default function ControlPanel({
                         />
                     </div>
                     <div className="setting-item">
-                        <label>🎨 Цвет:</label>
+                        <label>🎨 Color:</label>
                         <div className="color-inputs">
                             <input
                                 type="color"
@@ -139,7 +139,7 @@ export default function ControlPanel({
                                 onChange={(e) => onColorChange(e.target.value, 'base')}
                                 disabled={selectedCount === 0}
                                 className="color-input"
-                                title="Основной цвет"
+                                title="Base color"
                             />
                             <input
                                 type="color"
@@ -147,7 +147,7 @@ export default function ControlPanel({
                                 onChange={(e) => onColorChange(e.target.value, 'emissive')}
                                 disabled={selectedCount === 0}
                                 className="color-input"
-                                title="Цвет свечения (emissive)"
+                                title="Emissive color"
                             />
                         </div>
                     </div>
@@ -159,25 +159,25 @@ export default function ControlPanel({
                         onClick={onDeleteSelected}
                         disabled={selectedCount === 0}
                     >
-                        🗑️ Удалить ({selectedCount})
+                        🗑️ Delete ({selectedCount})
                     </button>
                     <button className="reset-btn" onClick={onReset}>
-                        🔄 Сбросить
+                        🔄 Reset
                     </button>
                 </div>
 
                 <div className="storage-section">
-                    <h3>Файл</h3>
+                    <h3>File</h3>
                     <div className="storage-buttons">
-                        <button className="storage-btn save-btn" onClick={onSave} title="Сохранить в файл">
-                            💾 Сохранить
+                        <button className="storage-btn save-btn" onClick={onSave} title="Save to file">
+                            💾 Save
                         </button>
                         <button
                             className="storage-btn load-btn"
                             onClick={() => fileInputRef.current?.click()}
-                            title="Загрузить из файла"
+                            title="Load from file"
                         >
-                            📂 Загрузить
+                            📂 Load
                         </button>
                         <input
                             type="file"
@@ -191,7 +191,7 @@ export default function ControlPanel({
             </div>
 
             <div className="elements-section">
-                <h2>Быстрый выбор элемента</h2>
+                <h2>Quick Element Select</h2>
                 <div className="elements-grid">
                     {ELEMENTS.map((element) => (
                         <button
@@ -208,33 +208,33 @@ export default function ControlPanel({
             </div>
 
             <div className="legend">
-                <h2>Легенда</h2>
+                <h2>Legend</h2>
                 <div className="legend-items">
                     <div className="legend-item">
                         <span className="legend-color proton-color"></span>
-                        <span>Протон</span>
+                        <span>Proton</span>
                     </div>
                     <div className="legend-item">
                         <span className="legend-color neutron-color"></span>
-                        <span>Нейтрон</span>
+                        <span>Neutron</span>
                     </div>
                     <div className="legend-item">
                         <span className="legend-color electron-color"></span>
-                        <span>Электрон</span>
+                        <span>Electron</span>
                     </div>
                     <div className="legend-item">
                         <span className="legend-color arrow-color">↗️</span>
-                        <span>Стрелка</span>
+                        <span>Arrow</span>
                     </div>
                 </div>
             </div>
 
             <div className="instructions">
-                <p>🖱️ <b>Выбор</b>: Клик на частице (Ctrl/Cmd для группы)</p>
-                <p>⚙️ <b>Режим</b>: Повторный клик для смены (Перемещение/Вращение)</p>
-                <p>✋ <b>Манипуляция</b>: Перетаскивайте стрелки или кольца гизмо</p>
-                <p>🗑️ <b>Удаление</b>: Клавиша <b>Del</b> или кнопка в меню</p>
-                <p>esc <b>Сброс</b>: Снять выделение с частицы</p>
+                <p>🖱️ <b>Selection</b>: Click on particle (Ctrl/Cmd for group)</p>
+                <p>⚙️ <b>Mode</b>: Click again to toggle (Move/Rotate)</p>
+                <p>✋ <b>Manipulation</b>: Drag gizmo arrows or rings</p>
+                <p>🗑️ <b>Deletion</b>: <b>Del</b> key or button in menu</p>
+                <p>esc <b>Reset</b>: Deselect all</p>
             </div>
         </div>
     )

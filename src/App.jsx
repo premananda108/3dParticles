@@ -672,11 +672,11 @@ function App() {
           setArrows(data.arrows || [])
           setSelectedIds(new Set())
         } else {
-          alert('Ошибка: Неверный формат файла')
+          alert('Error: Invalid file format')
         }
       } catch (error) {
         console.error('Error loading file:', error)
-        alert('Ошибка при чтении файла')
+        alert('Error reading file')
       }
     }
     reader.readAsText(file)
